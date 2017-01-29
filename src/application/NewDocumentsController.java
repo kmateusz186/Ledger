@@ -2,6 +2,7 @@ package application;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,6 +38,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.Month;
 
 public class NewDocumentsController {
 	
@@ -141,7 +143,8 @@ public class NewDocumentsController {
 					documentType = choiceBoxDocumentTypes.getValue().toString();
 					ld = datePickerDateDocument.getValue();
 					c =  Calendar.getInstance();
-					c.set(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
+					System.out.println(ld.getMonthValue());
+					c.set(ld.getYear(), ld.getMonthValue()-1, ld.getDayOfMonth());
 					date = c.getTime();
 					grossAmount = textFieldGrossAmount.getText().toString();
 					description = textAreaDescription.getText().toString();
@@ -195,10 +198,19 @@ public class NewDocumentsController {
 	private Boolean createExcel(Connection conn, Boolean vat) {
 		Boolean value = false;
 		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> mapTax = new HashMap<String, Object>();
 		ArrayList<String> documentTypes = new ArrayList<>();
+		Month monthModel = null;
 		int monthNumber = monthsMap.get(month);
-		Double income_sum = 0.00;
-		Double expense_sum = 0.00;
+		Double incomeSum = 0.00;
+		Double rewardSum = 0.00;
+		Double expenseSum = 0.00;
+		Double boughtGoodsSum = 0.00;
+		Double expenseInSum = 0.00;
+		Double finalExpenseSum = 0.00;
+		Double finalResultSum = 0.00;
+		Double finalTax = 0.00;
+		Double yearTaxSum = 0.00;
 		if(vat) {
 			try {
 				String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
@@ -222,10 +234,11 @@ public class NewDocumentsController {
 					map.put("nameC" + i, rs.getString(5));
 					map.put("addressC" + i, rs.getString(6));
 					map.put("description" + i, rs.getString(7));
-					if(rs.getString(1) == "przychody") {
-						map.put("income" + i, rs.getString(9).replaceAll(".", ","));
+					
+					if(rs.getString(1).equals("przychody")) {
+						map.put("income" + i, rs.getString(9).replace('.', ','));
 						map.put("incomeR" + i, "");
-						map.put("incomeS" + i, rs.getString(9).replaceAll(".", ","));
+						map.put("incomeS" + i, rs.getString(9).replace('.', ','));
 						map.put("buyG" + i, "");
 						map.put("expenseIn" + i, "");
 						map.put("rewards" + i, "");
@@ -234,18 +247,67 @@ public class NewDocumentsController {
 						map.put("expenseResearchD" + i, "");
 						map.put("expenseResearch" + i, "");
 						map.put("comment" + i, "");
-					} else if(rs.getString(1) == "zakupy/wydatki") {
-						map.put("rewards" + i, rs.getString(9).replaceAll(".", ","));
+						
+						incomeSum += rs.getDouble(9);
+						
+					} else if(rs.getString(1).equals("wynagrodzenia")) {
+						map.put("rewards" + i, rs.getString(9).replace('.', ','));
 						map.put("income" + i, "");
 						map.put("incomeR" + i, "");
 						map.put("incomeS" + i, "0,00");
 						map.put("buyG" + i, "");
 						map.put("expenseIn" + i, "");
 						map.put("expenseR" + i, "");
-						map.put("expenseS" + i, rs.getString(9).replaceAll(".", ","));
+						map.put("expenseS" + i, rs.getString(9).replace('.', ','));
 						map.put("expenseResearchD" + i, "");
 						map.put("expenseResearch" + i, "");
 						map.put("comment" + i, "");
+						
+						rewardSum += rs.getDouble(9);
+						
+					} else if(rs.getString(1).equals("zakupy/wydatki") || rs.getString(1).equals("import us³ug i WNT") || rs.getString(1).equals("pozosta³e wydatki/dowody wewnêtrzne")) {
+						map.put("expenseR" + i, rs.getString(9).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("buyG" + i, "");
+						map.put("expenseIn" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseS" + i, rs.getString(9).replace('.', ','));
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						expenseSum += rs.getDouble(9);
+						
+					} else if(rs.getString(1).equals("zakup towarów i materia³ów") || rs.getString(1).equals("import towarów i WNT")) {
+						map.put("buyG" + i, rs.getString(9).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("expenseR" + i, "");
+						map.put("expenseIn" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseS" + i, rs.getString(9).replace('.', ','));
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						boughtGoodsSum += rs.getDouble(9);
+					} else if(rs.getString(1).equals("koszty uboczne zakupu"))	{
+						map.put("expenseIn" + i, rs.getString(9).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("buyG" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseR" + i, "");
+						map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						expenseInSum += rs.getDouble(9);
 					}
 				i++;	 
 				}
@@ -292,42 +354,400 @@ public class NewDocumentsController {
 						map.put("expenseResearch" + i, "");
 						map.put("comment" + i, "");
 						
-						income_sum += rs.getDouble(8);
+						incomeSum += rs.getDouble(8);
 						
-					} else if(rs.getString(1).equals("zakupy/wydatki")) {
-						map.put("rewards" + i, rs.getString(8).replaceAll(".", ","));
+					} else if(rs.getString(1).equals("wynagrodzenia")) {
+						map.put("rewards" + i, rs.getString(8).replace('.', ','));
 						map.put("income" + i, "");
 						map.put("incomeR" + i, "");
 						map.put("incomeS" + i, "0,00");
 						map.put("buyG" + i, "");
 						map.put("expenseIn" + i, "");
 						map.put("expenseR" + i, "");
-						map.put("expenseS" + i, rs.getString(8).replaceAll(".", ","));
+						map.put("expenseS" + i, rs.getString(8).replace('.', ','));
 						map.put("expenseResearchD" + i, "");
 						map.put("expenseResearch" + i, "");
 						map.put("comment" + i, "");
 						
-						expense_sum += rs.getDouble(8);
+						rewardSum += rs.getDouble(8);
+						
+					} else if(rs.getString(1).equals("zakupy/wydatki") || rs.getString(1).equals("import us³ug i WNT") || rs.getString(1).equals("pozosta³e wydatki/dowody wewnêtrzne")) {
+						map.put("expenseR" + i, rs.getString(8).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("buyG" + i, "");
+						map.put("expenseIn" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						expenseSum += rs.getDouble(8);
+						
+					} else if(rs.getString(1).equals("zakup towarów i materia³ów") || rs.getString(1).equals("import towarów i WNT")) {
+						map.put("buyG" + i, rs.getString(8).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("expenseR" + i, "");
+						map.put("expenseIn" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseS" + i, "");
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						boughtGoodsSum += rs.getDouble(8);
+						
+					} else if(rs.getString(1).equals("koszty uboczne zakupu"))	{
+						map.put("expenseIn" + i, rs.getString(8).replace('.', ','));
+						map.put("income" + i, "");
+						map.put("incomeR" + i, "");
+						map.put("incomeS" + i, "0,00");
+						map.put("buyG" + i, "");
+						map.put("rewards" + i, "");
+						map.put("expenseR" + i, "");
+						map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+						map.put("expenseResearchD" + i, "");
+						map.put("expenseResearch" + i, "");
+						map.put("comment" + i, "");
+						
+						expenseInSum += rs.getDouble(8);
 					}
 				i++;	 
 				}
 			} catch(SQLException ex) {
 				System.out.println("B³¹d pobierania danych o dokumentach: " + ex);
 			}
-			map.put("sheetI", String.valueOf(income_sum).replace('.', ','));
+			
+			String strIncomeSum = String.valueOf(incomeSum);
+			String strExpenseSum = String.valueOf(expenseSum);
+			String strRewardSum = String.valueOf(rewardSum);
+			String strBoughtGoodsSum = String.valueOf(boughtGoodsSum);
+			String strExpenseInSum = String.valueOf(expenseInSum);
+			 
+			BigDecimal income = new BigDecimal(strIncomeSum);
+			BigDecimal incomeR = new BigDecimal("0.00");
+			BigDecimal expense = new BigDecimal(strExpenseSum); 
+			BigDecimal reward = new BigDecimal(strRewardSum); 
+			BigDecimal buyG = new BigDecimal(strBoughtGoodsSum);
+			BigDecimal expenseIn = new BigDecimal(strExpenseInSum);
+			BigDecimal expenseRes = new BigDecimal("0.00");
+			
+			map.put("sheetI", String.format("%.2f", incomeSum).replace('.', ','));
 			map.put("sheetIR", "0,00");
-			map.put("sheetIS", String.valueOf(income_sum).replace('.', ','));
+			map.put("sheetIS", String.format("%.2f", incomeSum).replace('.', ','));
 			
-			map.put("sheetRewards", String.valueOf(expense_sum).replace('.', ','));
-			map.put("sheetExpense", "0,00");
-			map.put("sheetExpenseS", String.valueOf(expense_sum).replace('.', ','));
+			map.put("sheetBuyG", String.format("%.2f", boughtGoodsSum).replace('.', ','));
 			
-			ExcelCreation create = new ExcelCreation(System.getenv("userprofile") + "/Desktop/AJO/template3.xlsx", 0, System.getenv("userprofile") + "/Desktop/AJO/out.xlsx", month + " " + year, map, month + " " + year);
-		    create.doExcel();
-		    value = true;
+			map.put("sheetExpenseIn", String.format("%.2f", expenseInSum).replace('.', ','));
+			
+			map.put("sheetRewards", String.format("%.2f", rewardSum).replace('.', ','));
+			map.put("sheetExpense", String.format("%.2f", expenseSum).replace('.', ','));
+			map.put("sheetExpenseS", String.format("%.2f", rewardSum + expenseSum).replace('.', ','));
+			
+			
+			if(updateMonthWithSums(conn, income, incomeR, buyG, expenseIn, reward, expense, expenseRes)) {
+				String taxWay = getTaxWay(conn);
+				Double tax = 0.0;
+				if(monthsMap.get(month) == 1) {
+					map.put("previousI", "0,00");
+					map.put("previousIR", "0,00");
+					map.put("previousIS", "0,00");
+					map.put("previousBuyG", "0,00");
+					map.put("previousExpenseIn", "0,00");
+					map.put("previousRewards", "0,00");
+					map.put("previousExpense", "0,00");
+					map.put("previousExpenseS", "0,00");
+					map.put("previousExpenseResearch", "0,00");
+					
+					map.put("yearI", String.format("%.2f", incomeSum).replace('.', ','));
+					map.put("yearIR", "0,00");
+					map.put("yearIS", String.format("%.2f", incomeSum + 0.0).replace('.', ','));
+					map.put("yearBuyG", String.format("%.2f", boughtGoodsSum).replace('.', ','));
+					map.put("yearExpenseIn", String.format("%.2f", expenseInSum).replace('.', ','));
+					map.put("yearRewards", String.format("%.2f", rewardSum).replace('.', ','));
+					map.put("yearExpense", String.format("%.2f", expenseSum).replace('.', ','));
+					map.put("yearExpenseS", String.format("%.2f", rewardSum + expenseSum).replace('.', ','));
+					map.put("yearExpenseResearch", "0,00");
+					
+					mapTax.put("income", String.format("%.2f", incomeSum).replace('.', ','));
+					mapTax.put("incomeSum", String.format("%.2f", incomeSum).replace('.', ','));
+					
+					finalExpenseSum = boughtGoodsSum + expenseInSum + rewardSum + expenseSum;
+					
+					mapTax.put("expense", String.format("%.2f", finalExpenseSum).replace('.', ','));
+					mapTax.put("expenseSum", String.format("%.2f", finalExpenseSum).replace('.', ','));
+					
+					finalResultSum = incomeSum - finalExpenseSum;
+					
+					mapTax.put("result", String.format("%.2f", finalResultSum).replace('.', ','));
+					mapTax.put("resultSum", String.format("%.2f", finalResultSum).replace('.', ','));
+					
+					mapTax.put("resultSumMinusLoss", String.format("%.2f", finalResultSum).replace('.', ','));
+					
+					mapTax.put("resultSumRounded", String.format("%d", finalResultSum.intValue()));
+					
+					if(finalResultSum > 0) {
+						if(taxWay.equals("zasady ogólne")) {
+							if(finalResultSum < 85528) {
+								tax = finalResultSum * 0.18;
+							} else {
+								tax = finalResultSum * 0.32;
+							}	
+						} else if(taxWay.equals("podatek liniowy")) {
+							tax = finalResultSum * 0.19;
+						}
+						
+						mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
+						mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
+						mapTax.put("healthIns", String.format("%.2f", 255.99).replace('.', ','));
+						mapTax.put("taxValueMinusHI", String.format("%.2f", tax.intValue() - 255.99).replace('.', ','));
+						mapTax.put("yearTax", "0,00");
+						finalTax = tax.intValue() - 255.99;
+						mapTax.put("finalTax", String.format("%.2f", finalTax).replace('.', ','));
+						mapTax.put("finalTaxRounded", String.format("%d", finalTax.intValue()));
+					} else {
+						mapTax.put("taxValue", "0,00");
+						mapTax.put("taxValueRounded", "0,00");
+						mapTax.put("healthIns", String.format("%.2f", 255.99).replace('.', ','));
+						mapTax.put("taxValueMinusHI", "0,00");
+						mapTax.put("yearTax", "0,00");
+						mapTax.put("finalTax", "0,00");
+						mapTax.put("finalTaxRounded", "0,00"); 
+					}
+					
+				} else {
+					monthModel = getMonthSums(conn);
+					if(month!=null) {
+						map.put("previousI", String.format("%.2f", monthModel.getIncome()).replace('.', ','));
+						map.put("previousIR", String.format("%.2f", monthModel.getIncomeR()).replace('.', ','));
+						map.put("previousIS", String.format("%.2f",monthModel.getIncome() + monthModel.getIncomeR()).replace('.', ',')); //String.valueOf(monthModel.getIncome() + monthModel.getIncomeR()).replace('.', ','));
+						map.put("previousBuyG", String.format("%.2f", monthModel.getBuyG()).replace('.', ','));
+						map.put("previousExpenseIn", String.format("%.2f", monthModel.getExpenseIn()).replace('.', ','));
+						map.put("previousRewards", String.format("%.2f", monthModel.getReward()).replace('.', ','));
+						map.put("previousExpense", String.format("%.2f", monthModel.getExpense()).replace('.', ','));
+						map.put("previousExpenseS", String.format("%.2f", monthModel.getReward() + monthModel.getExpense()).replace('.', ','));
+						map.put("previousExpenseResearch", String.format("%.2f", monthModel.getExpenseRes()).replace('.', ','));
+						
+						map.put("yearI", String.format("%.2f", monthModel.getIncome() + incomeSum).replace('.', ','));
+						map.put("yearIR", String.format("%.2f", monthModel.getIncomeR() + 0.00).replace('.', ','));
+						map.put("yearIS", String.format("%.2f", monthModel.getIncome() + monthModel.getIncomeR() + incomeSum + 0.0).replace('.', ','));
+						map.put("yearBuyG", String.format("%.2f", monthModel.getBuyG() + boughtGoodsSum).replace('.', ','));
+						map.put("yearExpenseIn", String.format("%.2f", monthModel.getExpenseIn() + expenseInSum).replace('.', ','));
+						map.put("yearRewards", String.format("%.2f", monthModel.getReward() + rewardSum).replace('.', ','));
+						map.put("yearExpense", String.format("%.2f", monthModel.getExpense() + expenseSum).replace('.', ','));
+						map.put("yearExpenseS", String.format("%.2f", monthModel.getReward() + monthModel.getExpense() + rewardSum + expenseSum).replace('.', ','));
+						map.put("yearExpenseResearch", String.format("%.2f", monthModel.getExpenseRes() + 0.0).replace('.', ','));
+						
+						mapTax.put("income", String.format("%.2f", monthModel.getIncome() + incomeSum).replace('.', ','));
+						mapTax.put("incomeSum", String.format("%.2f", monthModel.getIncome() + incomeSum).replace('.', ','));
+						
+						finalExpenseSum = monthModel.getBuyG() + boughtGoodsSum + monthModel.getExpenseIn() + expenseInSum + monthModel.getReward() + rewardSum + monthModel.getExpense() + expenseSum;
+						
+						mapTax.put("expense", String.format("%.2f", finalExpenseSum).replace('.', ','));
+						mapTax.put("expenseSum", String.format("%.2f", finalExpenseSum).replace('.', ','));
+						
+						finalResultSum = monthModel.getIncome() + incomeSum - finalExpenseSum;
+						
+						mapTax.put("result", String.format("%.2f", finalResultSum).replace('.', ','));
+						mapTax.put("resultSum", String.format("%.2f", finalResultSum).replace('.', ','));
+						
+						mapTax.put("resultSumMinusLoss", String.format("%.2f", finalResultSum).replace('.', ','));
+						
+						mapTax.put("resultSumRounded", String.format("%d", finalResultSum.intValue()));
+						yearTaxSum = getMonthTaxes(conn);
+						if(finalResultSum > 0) {
+							if(taxWay.equals("zasady ogólne")) {
+								if(finalResultSum < 85528) {
+									tax = finalResultSum * 0.18;
+								} else {
+									tax = finalResultSum * 0.32;
+								}	
+							} else if(taxWay.equals("podatek liniowy")) {
+								tax = finalResultSum * 0.19;
+							}				
+							mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
+							mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
+							mapTax.put("healthIns", String.format("%.2f", 255.99 * monthNumber).replace('.', ','));
+							mapTax.put("taxValueMinusHI", String.format("%.2f", tax.intValue() - 255.99 * monthNumber).replace('.', ','));
+							mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
+							finalTax = tax.intValue() - 255.99 * monthNumber - yearTaxSum;
+							mapTax.put("finalTax", String.format("%.2f", finalTax).replace('.', ','));
+							mapTax.put("finalTaxRounded", String.format("%d", finalTax.intValue()));
+						} else {
+							mapTax.put("taxValue", "0,00");
+							mapTax.put("taxValueRounded", "0,00");
+							mapTax.put("healthIns", String.format("%.2f", 255.99 * monthNumber).replace('.', ','));
+							mapTax.put("taxValueMinusHI", "0,00");
+							mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
+							mapTax.put("finalTax", "0,00");
+							mapTax.put("finalTaxRounded", "0,00");
+						}
+					} else {
+						System.out.println("Nie pobrano danych z poprzednich miesiecy");
+					}
+				}
+				
+				ExcelCreation createLedger = new ExcelCreation(System.getenv("userprofile") + "/Desktop/AJO/template3.xlsx", 0, System.getenv("userprofile") + "/Desktop/AJO/out.xlsx", month + " " + year, map, month + " " + year);
+			    createLedger.doExcel();
+			    
+			    BigDecimal bgFinalTax = new BigDecimal(String.valueOf(finalTax.intValue()));
+			    
+			    if(updateMonthWithTax(conn, bgFinalTax)) {
+			    	ExcelCreation createTax = new ExcelCreation(System.getenv("userprofile") + "/Desktop/AJO/template_podatek.xlsx", 0, System.getenv("userprofile") + "/Desktop/AJO/outPodatek.xlsx", month + " " + year, mapTax, month + " " + year);
+				    createTax.doExcel();
+			    	value = true;
+			    } else {
+			    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem");
+			    }
+			} else {
+				System.out.println("Nie zaktualizowano tabeli miesiac");
+			}
+		}
+		return value;
+	}
+	
+	private Boolean updateMonthWithTax(Connection conn, BigDecimal tax) {
+		Boolean result = false;
+		int monthNumber = monthsMap.get(month);
+			try {
+				String query = String.format("update miesiac set podatek = '%s' "
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
+						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", tax, monthNumber, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+		
+		return result;
+	}
+	
+	private String getTaxWay(Connection conn) {
+		String way = "";
+		try {
+			String query = String.format("select sposob_opodatkowania.nazwa "
+						+ "from uzytkownik, sposob_opodatkowania " 
+					+ "where uzytkownik.id_sposob_opodatkowania = sposob_opodatkowania.id_sposob_opodatkowania "
+					+ "and uzytkownik.id_uzytkownik = '%d'", id_uzytkownik);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				way = rs.getString(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania nazwy sposobu opodatkowania: " + ex);
+		}
+		return way;
+	}
+	
+	private Double getMonthTaxes(Connection conn) {
+		Double tax = 0.00;
+		int monthNumber = monthsMap.get(month);
+		try {
+			String query = String.format("select miesiac.podatek "
+						+ "from miesiac, uzytkownik, rok " 
+					+ "where miesiac.id_rok = rok.id_rok "
+					+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and month(miesiac.data) >= '1' "
+					+ "and month(miesiac.data) < '%d' "
+					+ "and year(rok.data) = '%s'", id_uzytkownik, monthNumber, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				tax += rs.getDouble(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych miesiaca: " + ex);
+		}
+		return tax;
+	}
+	
+	private Month getMonthSums(Connection conn) {
+		Month monthModel = new Month();
+		Double income = 0.00;
+		Double incomeR = 0.00;
+		Double buyG = 0.00;
+		Double incomeIn = 0.00;
+		Double reward = 0.00;
+		Double expense = 0.00;
+		Double expenseRes = 0.00;
+		int monthNumber = monthsMap.get(month);
+		try {
+			String query = String.format("select miesiac.suma_wartosc_sprz_towar, miesiac.suma_poz_przych, miesiac.suma_zak_towar, "
+						+ "miesiac.suma_koszt_ub, miesiac.suma_wynagrodzen, miesiac.suma_wydatkow, miesiac.suma_koszt_bad_rozw "
+						+ "from miesiac, uzytkownik, rok " 
+					+ "where miesiac.id_rok = rok.id_rok "
+					+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and month(miesiac.data) >= '1' "
+					+ "and month(miesiac.data) < '%d' "
+					+ "and year(rok.data) = '%s'", id_uzytkownik, monthNumber, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				income += rs.getDouble(1);
+				incomeR += rs.getDouble(2);
+				buyG += rs.getDouble(3);
+				incomeIn += rs.getDouble(4);
+				reward += rs.getDouble(5);
+				expense += rs.getDouble(6);
+				expenseRes += rs.getDouble(7);	
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych miesiaca: " + ex);
+		}
+		monthModel.setIncome(income);
+		monthModel.setIncomeR(incomeR);
+		monthModel.setBuyG(buyG);
+		monthModel.setExpenseIn(incomeIn);
+		monthModel.setReward(reward);
+		monthModel.setExpense(expense);
+		monthModel.setExpenseRes(expenseRes);
+		return monthModel;
+	}
+	
+	private Boolean updateMonthWithSums(Connection conn, BigDecimal incomeSum, BigDecimal incomeRSum, BigDecimal buyGSum, BigDecimal expenseInSum, BigDecimal rewardSum, BigDecimal expenseSum, BigDecimal expenseResSum) {
+		Boolean result = false;
+		int monthNumber = monthsMap.get(month);
+		if(monthNumber == 1) {
+			try {
+				String query = String.format("update miesiac set suma_wartosc_sprz_towar = '%s', suma_poz_przych = '%s', suma_zak_towar = '%s', "
+						+ "suma_koszt_ub = '%s', suma_wynagrodzen = '%s', suma_wydatkow = '%s', suma_koszt_bad_rozw = '%s', lp = %d "
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
+						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn), monthNumber, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+		} else {
+			try {
+				String query = String.format("update miesiac set suma_wartosc_sprz_towar = '%s', suma_poz_przych = '%s', suma_zak_towar = '%s', "
+						+ "suma_koszt_ub = '%s', suma_wynagrodzen = '%s', suma_wydatkow = '%s', suma_koszt_bad_rozw = '%s', lp = %d "
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
+						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn) + getOrderNumberFromLastMonth(conn), monthNumber, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
 		}
 		
-		return value;
+		return result;
 	}
 	
 	private Boolean ifVatUser(Connection conn) {
@@ -355,7 +775,13 @@ public class NewDocumentsController {
 		System.out.println(dateFormat.format(date));
 		int idDocumentType = getIdDocumentType(conn, documentType);
 		int idMonth = getIdMonth(conn);
-		int orderNumber = getDocumentOrderNumber(conn) + 1;
+		int orderNumber = 0;
+		if(monthsMap.get(month) == 1) {
+			orderNumber = getDocumentOrderNumber(conn) + 1;
+		} else {
+			orderNumber = getOrderNumberFromLastMonth(conn) + getDocumentOrderNumber(conn) + 1;
+		}
+		
 		BigDecimal netA;
 		BigDecimal grossA;
 		BigDecimal vatA;
@@ -433,6 +859,27 @@ public class NewDocumentsController {
 			}
 		} catch(SQLException ex) {
 			System.out.println("B³¹d pobierania id miesiaca: " + ex);
+		}
+		return id;
+	}
+	
+	private int getOrderNumberFromLastMonth(Connection conn) {
+		int id = 0;
+		int monthNumber = monthsMap.get(month);
+		try {
+			String query = String.format("select lp from miesiac, uzytkownik, rok " 
+					+ "where miesiac.id_rok = rok.id_rok "
+					+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and month(miesiac.data) = '%d' "
+					+ "and year(rok.data) = '%s'", id_uzytkownik, monthNumber - 1, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				id = rs.getInt(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania lp miesiaca: " + ex);
 		}
 		return id;
 	}
