@@ -68,7 +68,9 @@ public class MainWindowController implements Initializable {
 			            //stage.setScene(scene);
 			            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenuWindowFXML.fxml"));
 			            stage = (Stage) gridPaneEditor.getScene().getWindow();
-			            stage.setScene(new Scene(loader.load()));
+			            Scene scene = new Scene(loader.load());
+						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			            stage.setScene(scene);
 			            MainMenuWindowController mainMenuWindowController = loader.<MainMenuWindowController>getController();
 			            mainMenuWindowController.initData(id_uzytkownik);
 			            stage.setResizable(false);
@@ -207,10 +209,21 @@ public class MainWindowController implements Initializable {
 							+ "CONSTRAINT FK_miesiac_rok FOREIGN KEY (id_rok) REFERENCES rok (id_rok)"
 							+ ")\\;"
 							
+							+ "create table if not exists kontrahent (id_kontrahent integer auto_increment primary key, "
+							+ "nazwa varchar(255) not null, "
+							+ "adres varchar(255) not null)\\;"
+							
+							+ "merge into kontrahent key(nazwa) values(1, 'AUCHAN POLSKA sp. z o.o.', 'Piaseczno 05-500, ul. Pu³awska 38')\\;"
+							+ "merge into kontrahent key(nazwa) values(2, 'SHELL POLSKA sp. z o.o.', 'Warszawa 02-366, ul. Bitwy Warszawskiej 1920 r.')\\;"
+							+ "merge into kontrahent key(nazwa) values(3, 'CASTORAMA POLSKA sp. z o.o.', 'Warszawa 02-255, ul. Krakowiaków 78')\\;"
+							+ "merge into kontrahent key(nazwa) values(4, 'T-MOBILE POLSKA SPÓ£KA AKCYJNA', 'Warszawa 02-674, ul. Marynarska 12')\\;"
+							+ "merge into kontrahent key(nazwa) values(5, 'PKP INTERCITY SPÓ£KA AKCYJNA', 'Warszawa 02-305, al. Aleje Jerozolimskie 142A')\\;"
+							
 							+ "create table if not exists dokument_ksiegowy (id_dokument_ksiegowy integer auto_increment primary key, "
 							+ "id_uzytkownik integer, "
 							+ "id_typ_dokumentu integer, "
 							+ "id_miesiac integer, "
+							+ "id_kontrahent integer, "
 							+ "numer varchar(255) not null, "
 							+ "data date not null, "
 							+ "kwota_netto decimal(10,2), "
@@ -218,11 +231,10 @@ public class MainWindowController implements Initializable {
 							+ "opis varchar(255) not null, "
 							+ "kwota_vat decimal(10,2), "
 							+ "lp integer not null, "
-							+ "nazwa_kontrahenta varchar(255) not null, "
-							+ "adres_kontrahenta varchar(255) not null, "
 							+ "CONSTRAINT FK_dokument_uzytkownik FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik (id_uzytkownik), "
 							+ "CONSTRAINT FK_dokument_typ_dokumentu FOREIGN KEY (id_typ_dokumentu) REFERENCES typ_dokumentu (id_typ_dokumentu), "
-							+ "CONSTRAINT FK_dokument_miesiac FOREIGN KEY (id_miesiac) REFERENCES miesiac (id_miesiac)"
+							+ "CONSTRAINT FK_dokument_miesiac FOREIGN KEY (id_miesiac) REFERENCES miesiac (id_miesiac), "
+							+ "CONSTRAINT FK_dokument_kontrahent FOREIGN KEY (id_kontrahent) REFERENCES kontrahent (id_kontrahent)"
 							+ ")\\;"
 							
 							+ "create table if not exists miesiac_vat (id_miesiac_vat integer auto_increment primary key, "

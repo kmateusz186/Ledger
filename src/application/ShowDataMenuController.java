@@ -43,17 +43,43 @@ public class ShowDataMenuController {
 			stage.setResizable(false);
 			stage.show();
 		} else if(event.getSource()==btnShowAddedDocuments) {
-			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("DocumentsFXML.fxml"));
+            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
+            DocumentsController documentsController = loader.<DocumentsController>getController();
+            documentsController.initData(id_uzytkownik);
+            stage.setResizable(false);
+            stage.show();
 		} else if (event.getSource()==btnGeneratedTaxes) {
 			
 		} else if (event.getSource()==btnEquipment) {
-			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("EquipmentFXML.fxml"));
+            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
+            EquipmentController equipmentController = loader.<EquipmentController>getController();
+            equipmentController.initData(id_uzytkownik);
+            stage.setResizable(false);
+            stage.show();
 		} else if (event.getSource()==btnFixedAssets) {
-			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("FixedAssetsFXML.fxml"));
+            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
+            FixedAssetsController fixedAssetsController = loader.<FixedAssetsController>getController();
+            fixedAssetsController.initData(id_uzytkownik);
+            stage.setResizable(false);
+            stage.show();
 		} else if(event.getSource()==btnMainMenu) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenuWindowFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
             MainMenuWindowController mainMenuWindowController = loader.<MainMenuWindowController>getController();
             mainMenuWindowController.initData(id_uzytkownik);
             stage.setResizable(false);

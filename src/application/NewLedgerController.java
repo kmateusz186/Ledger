@@ -74,7 +74,9 @@ public class NewLedgerController implements Initializable {
 					if(addLedger(conn, name, year)) {
 						FXMLLoader loader = new FXMLLoader(getClass().getResource("NewLedgerFXML.fxml"));
 			            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-			            stage.setScene(new Scene(loader.load()));
+			            Scene scene = new Scene(loader.load());
+						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			            stage.setScene(scene);
 			            NewLedgerController newLedgerController = loader.<NewLedgerController>getController();
 			            newLedgerController.initData(id_uzytkownik);
 			            stage.setResizable(false);
@@ -95,7 +97,9 @@ public class NewLedgerController implements Initializable {
 				String year = listViewLedgers.getSelectionModel().getSelectedItem();
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("NewMonthLedgerFXML.fxml"));
 	            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-	            stage.setScene(new Scene(loader.load()));
+	            Scene scene = new Scene(loader.load());
+				scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+	            stage.setScene(scene);
 	            NewMonthLedgerController newMonthLedgerController = loader.<NewMonthLedgerController>getController();
 	            newMonthLedgerController.initData(id_uzytkownik, year);
 	            stage.setResizable(false);
@@ -106,7 +110,9 @@ public class NewLedgerController implements Initializable {
 		} else if(event.getSource()==btnMainMenu) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenuWindowFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
             MainMenuWindowController mainMenuWindowController = loader.<MainMenuWindowController>getController();
             mainMenuWindowController.initData(id_uzytkownik);
             stage.setResizable(false);

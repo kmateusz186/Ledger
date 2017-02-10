@@ -2,12 +2,14 @@ package application;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -18,6 +20,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.swing.plaf.basic.BasicToolBarUI.DockingListener;
 
 import components.ExcelCreation;
 import database.DBConnection;
@@ -33,6 +37,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -45,7 +50,7 @@ import javafx.stage.Stage;
 import model.DocumentTable;
 import model.Month;
 
-public class NewDocumentsController {
+public class NewDocumentsVatController {
 	
 	private int id_uzytkownik;
 	private String year;
@@ -72,7 +77,11 @@ public class NewDocumentsController {
 	@FXML
 	private DatePicker datePickerDateDocument;
 	@FXML
+	private TextField textFieldNetAmount;
+	@FXML
 	private TextField textFieldGrossAmount;
+	@FXML
+	private TextField textFieldVatAmount;
 	@FXML
 	private TextArea textAreaDescription;
 	@FXML
@@ -123,17 +132,18 @@ public class NewDocumentsController {
 		} else if(event.getSource()==btnNewDocument) {
 			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 			conn = openConnection(connStr);
-				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textFieldGrossAmount.getText().isEmpty() && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty()) {
+				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textFieldNetAmount.getText().isEmpty() && !textFieldVatAmount.getText().isEmpty() && !textFieldGrossAmount.getText().isEmpty() && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty()) {
 					numberDocument = textFieldNumberDocument.getText().toString();
 					documentType = choiceBoxDocumentTypes.getValue().toString();
 					ld = datePickerDateDocument.getValue();
 					c =  Calendar.getInstance();
-					System.out.println(ld.getMonthValue());
-					c.set(ld.getYear(), ld.getMonthValue()-1, ld.getDayOfMonth());
+					c.set(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
 					date = c.getTime();
+					netAmount = textFieldNetAmount.getText().toString();
+					vatAmount = textFieldVatAmount.getText().toString();
 					grossAmount = textFieldGrossAmount.getText().toString();
 					description = textAreaDescription.getText().toString();
-					nameContractor = comboBoxNameContractor.getValue().toString();
+					nameContractor = comboBoxNameContractor.getSelectionModel().getSelectedItem();
 					addressContractor = textFieldAddressContractor.getText().toString();
 					
 					Double amount = Double.valueOf(grossAmount.replace(',', '.'));
@@ -195,11 +205,11 @@ public class NewDocumentsController {
 		} else if(event.getSource()==btnCreateExcel) {
 			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 			conn = openConnection(connStr);
-			if(createExcel(conn)) {
+				if(createExcel(conn)) {
 					
-			} else {
-				textError.setText("Wyst¹pi³ b³¹d, nie utworzono pliku");
-			}
+				} else {
+					textError.setText("Wyst¹pi³ b³¹d, nie utworzono pliku");
+				}	
 		} else if(event.getSource()==btnShowDocument) {
 			int documentId;
 			DocumentTable documentTable = tableViewDocuments.getSelectionModel().getSelectedItem();
@@ -258,6 +268,7 @@ public class NewDocumentsController {
 		Boolean value = false;
 		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> mapTax = new HashMap<String, Object>();
+		ArrayList<String> documentTypes = new ArrayList<>();
 		Month monthModel = null;
 		int monthNumber = monthsMap.get(month);
 		Double incomeSum = 0.00;
@@ -272,7 +283,7 @@ public class NewDocumentsController {
 			try {
 				String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
 						+ "dokument_ksiegowy.data, kontrahent.nazwa, kontrahent.adres, "
-						+ "dokument_ksiegowy.opis, dokument_ksiegowy.kwota_brutto "
+						+ "dokument_ksiegowy.opis, dokument_ksiegowy.kwota_brutto, dokument_ksiegowy.kwota_netto, dokument_ksiegowy.kwota_vat "
 				+ "from dokument_ksiegowy, miesiac, uzytkownik, rok, typ_dokumentu, kontrahent " 
 				+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
 				+ "and dokument_ksiegowy.id_miesiac = miesiac.id_miesiac "
@@ -297,9 +308,9 @@ public class NewDocumentsController {
 						map.put("description" + i, rs.getString(7));
 						
 						if(rs.getString(1).equals("przychody")) {
-							map.put("income" + i, rs.getString(8).replace('.', ','));
+							map.put("income" + i, rs.getString(9).replace('.', ','));
 							map.put("incomeR" + i, "");
-							map.put("incomeS" + i, rs.getString(8).replace('.', ','));
+							map.put("incomeS" + i, rs.getString(9).replace('.', ','));
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
@@ -309,55 +320,54 @@ public class NewDocumentsController {
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							incomeSum += rs.getDouble(8);
+							incomeSum += rs.getDouble(9);
 							
 						} else if(rs.getString(1).equals("wynagrodzenia")) {
-							map.put("rewards" + i, rs.getString(8).replace('.', ','));
+							map.put("rewards" + i, rs.getString(9).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("expenseR" + i, "");
-							map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							rewardSum += rs.getDouble(8);
+							rewardSum += rs.getDouble(9);
 							
 						} else if(rs.getString(1).equals("zakupy/wydatki") || rs.getString(1).equals("import us³ug i WNT") || rs.getString(1).equals("pozosta³e wydatki/dowody wewnêtrzne")) {
-							map.put("expenseR" + i, rs.getString(8).replace('.', ','));
+							map.put("expenseR" + i, rs.getString(9).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
-							map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							expenseSum += rs.getDouble(8);
+							expenseSum += rs.getDouble(9);
 							
 						} else if(rs.getString(1).equals("zakup towarów i materia³ów") || rs.getString(1).equals("import towarów i WNT")) {
-							map.put("buyG" + i, rs.getString(8).replace('.', ','));
+							map.put("buyG" + i, rs.getString(9).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("expenseR" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
-							map.put("expenseS" + i, "");
+							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							boughtGoodsSum += rs.getDouble(8);
-							
+							boughtGoodsSum += rs.getDouble(9);
 						} else if(rs.getString(1).equals("koszty uboczne zakupu"))	{
-							map.put("expenseIn" + i, rs.getString(8).replace('.', ','));
+							map.put("expenseIn" + i, rs.getString(9).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
@@ -369,7 +379,7 @@ public class NewDocumentsController {
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							expenseInSum += rs.getDouble(8);
+							expenseInSum += rs.getDouble(9);
 						}
 					}
 				i++;	 
@@ -726,16 +736,22 @@ public class NewDocumentsController {
 			orderNumber = getOrderNumberFromLastMonth(conn) + getDocumentOrderNumber(conn) + 1;
 		}
 		
+		BigDecimal netA;
 		BigDecimal grossA;
+		BigDecimal vatA;
 		String strGrossAmount = grossAmount.replaceAll(",",".");
 		System.out.println(strGrossAmount);
 		grossA = new BigDecimal(strGrossAmount);
 		System.out.println(grossA);
+			String strNetAmount=netAmount.replaceAll(",",".");
+			netA = new BigDecimal(strNetAmount);
+			String strVatAmount = vatAmount.replaceAll(",",".");
+			vatA = new BigDecimal(strVatAmount);
 			try {
 				String query = String.format("insert into dokument_ksiegowy(id_uzytkownik, id_typ_dokumentu, id_miesiac, id_kontrahent, numer, data, "
-						+ "kwota_brutto, opis, lp) "
-						+ "values('%d','%d','%d','%d','%s','%s','%s','%s','%d')", 
-						id_uzytkownik, idDocumentType, idMonth, idContractor, numberDocument, dateFormat.format(date), grossA, description, orderNumber); 
+						+ "kwota_netto, kwota_brutto, opis, kwota_vat, lp) "
+						+ "values('%d','%d','%d','%d','%s','%s','%f','%f','%s','%f','%d')", 
+						id_uzytkownik, idDocumentType, idMonth, idContractor, numberDocument, dateFormat.format(date), netA, grossA, description, vatA, orderNumber); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -933,7 +949,45 @@ public class NewDocumentsController {
 	private void setAmountFields() {
 		DecimalFormat format = new DecimalFormat( "#.00" );
 
+		textFieldNetAmount.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
 		textFieldGrossAmount.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldVatAmount.setTextFormatter( new TextFormatter<>(c ->
 		{
 		    if ( c.getControlNewText().isEmpty() )
 		    {

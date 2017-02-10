@@ -1,1 +1,11 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.table-column {
+  -fx-alignment: CENTER;
+}
+
+#tc-month, #tc-month-u {
+  -fx-font-weight: bold;
+}
+
+#table-view-new-asset, #table-view-used-asset {
+	-fx-font-size: 15px;
+}

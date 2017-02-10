@@ -75,7 +75,9 @@ public class NewMonthLedgerController implements Initializable {
 				if(addNewMonth(conn, month_number)) {
 					FXMLLoader loader = new FXMLLoader(getClass().getResource("NewMonthLedgerFXML.fxml"));
 		            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-		            stage.setScene(new Scene(loader.load()));
+		            Scene scene = new Scene(loader.load());
+					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		            stage.setScene(scene);
 		            NewMonthLedgerController newMonthLedgerController = loader.<NewMonthLedgerController>getController();
 		            newMonthLedgerController.initData(id_uzytkownik, year);
 		            stage.setResizable(false);
@@ -90,25 +92,63 @@ public class NewMonthLedgerController implements Initializable {
 		} else if(event.getSource()==btnNewDocuments) {
 			if(listViewMonths.getSelectionModel().getSelectedItem()!=null) {
 				String month = listViewMonths.getSelectionModel().getSelectedItem();
-				FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
-	            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-	            stage.setScene(new Scene(loader.load()));
-	            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-	            newDocumentsController.initData(id_uzytkownik, year, month);
-	            stage.setResizable(false);
-	            stage.show();
+				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
+				conn = openConnection(connStr);
+				if(ifVatUser(conn)) {
+					FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
+		            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+		            Scene scene = new Scene(loader.load());
+					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		            stage.setScene(scene);
+		            NewDocumentsVatController newDocumentsVatController = loader.<NewDocumentsVatController>getController();
+		            newDocumentsVatController.initData(id_uzytkownik, year, month);
+		            stage.setResizable(false);
+		            stage.show();
+				} else {
+					FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+		            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+		            Scene scene = new Scene(loader.load());
+					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		            stage.setScene(scene);
+		            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
+		            newDocumentsController.initData(id_uzytkownik, year, month);
+		            stage.setResizable(false);
+		            stage.show();
+				}
+				closeConnection(conn);
 			} else {
 				textError.setText("Nie wybrano miesi¹ca!");
 			}
 		} else if(event.getSource()==btnMainMenu) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("NewLedgerFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
             NewLedgerController newLedgerController = loader.<NewLedgerController>getController();
             newLedgerController.initData(id_uzytkownik);
             stage.setResizable(false);
             stage.show();
 		}
+	}
+	
+	private Boolean ifVatUser(Connection conn) {
+		Boolean vat = false;
+		try {
+			String query = String.format("select vat from uzytkownik where id_uzytkownik = '%d'", id_uzytkownik);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				if(rs.getString(1)=="tak") {
+					vat = true;
+				} else {
+					vat = false;
+				}
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d sprawdzenia czy u¿ytkownik prowadzi rejestr vat: " + ex);
+		}
+		return vat;
 	}
 	
 	private Boolean addNewMonth(Connection conn, int month) {

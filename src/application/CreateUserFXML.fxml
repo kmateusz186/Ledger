@@ -9,9 +9,9 @@
 
 <AnchorPane fx:id="anchorPaneEditor" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.CreateUserController">
    <children>
-      <GridPane fx:id="gridPaneEditor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <GridPane prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tworzenie użytkownika" textAlignment="CENTER" wrappingWidth="604.13671875" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Tworzenie użytkownika" GridPane.columnSpan="2" GridPane.halignment="CENTER">
                <font>
                   <Font size="23.0" />
                </font>
@@ -31,7 +31,7 @@
                   <Font name="System Bold Italic" size="18.0" />
                </font>
             </Text>
-            <TextField fx:id="textFieldLogin" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <TextField fx:id="textFieldLogin" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="20.0" right="150.0" />
                </GridPane.margin>

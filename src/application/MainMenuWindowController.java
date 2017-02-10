@@ -44,7 +44,9 @@ public class MainMenuWindowController implements Initializable {
 		if(event.getSource()==btnLedger) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("NewLedgerFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
             NewLedgerController newLedgerController = loader.<NewLedgerController>getController();
             newLedgerController.initData(id_uzytkownik);
             stage.setResizable(false);
@@ -52,7 +54,9 @@ public class MainMenuWindowController implements Initializable {
 		} else if(event.getSource()==btnShowData) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("ShowDataMenuFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
             ShowDataMenuController showDataMenuController = loader.<ShowDataMenuController>getController();
             showDataMenuController.initData(id_uzytkownik);
             stage.setResizable(false);
