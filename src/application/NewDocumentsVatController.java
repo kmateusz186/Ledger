@@ -3,6 +3,7 @@ package application;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,6 +44,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
@@ -77,11 +79,25 @@ public class NewDocumentsVatController {
 	@FXML
 	private DatePicker datePickerDateDocument;
 	@FXML
-	private TextField textFieldNetAmount;
+	private TextField textFieldNet1;
 	@FXML
-	private TextField textFieldGrossAmount;
+	private TextField textFieldNet2;
 	@FXML
-	private TextField textFieldVatAmount;
+	private TextField textFieldNet3;
+	@FXML
+	private TextField textFieldNet4;
+	@FXML
+	private TextField textFieldNet5;
+	@FXML
+	private TextField textFieldVat1;
+	@FXML
+	private TextField textFieldVat2;
+	@FXML
+	private TextField textFieldVat3;
+	@FXML
+	private TextField textFieldVat4;
+	@FXML
+	private TextField textFieldVat5;
 	@FXML
 	private TextArea textAreaDescription;
 	@FXML
@@ -118,8 +134,16 @@ public class NewDocumentsVatController {
 		String description;
 		String nameContractor;
 		String addressContractor;
-		String netAmount = "";
-		String vatAmount = "";
+		String netAmount1 = "";
+		String vatAmount1 = "";
+		String netAmount2 = "";
+		String vatAmount2 = "";
+		String netAmount3 = "";
+		String vatAmount3 = "";
+		String netAmount4 = "";
+		String vatAmount4 = "";
+		String netAmount5 = "";
+		String vatAmount5 = "";
 		if(event.getSource()==btnLogOut) {
 			stage = (Stage) anchorPaneEditor.getScene().getWindow();
 			root = FXMLLoader.load(getClass().getResource("WelcomeWindowFXML.fxml"));
@@ -130,18 +154,30 @@ public class NewDocumentsVatController {
 			stage.show();
 			
 		} else if(event.getSource()==btnNewDocument) {
+			Double netSum = 0.0;
+			Double vatSum = 0.0;
 			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 			conn = openConnection(connStr);
-				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textFieldNetAmount.getText().isEmpty() && !textFieldVatAmount.getText().isEmpty() && !textFieldGrossAmount.getText().isEmpty() && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty()) {
+				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty() && !textFieldNet1.getText().isEmpty() && !textFieldVat1.getText().isEmpty() && !textFieldNet2.getText().isEmpty() && !textFieldVat2.getText().isEmpty() && !textFieldNet3.getText().isEmpty() && !textFieldVat3.getText().isEmpty() && !textFieldNet4.getText().isEmpty() && !textFieldVat4.getText().isEmpty() && !textFieldNet5.getText().isEmpty() && !textFieldVat5.getText().isEmpty()) {
 					numberDocument = textFieldNumberDocument.getText().toString();
 					documentType = choiceBoxDocumentTypes.getValue().toString();
 					ld = datePickerDateDocument.getValue();
 					c =  Calendar.getInstance();
 					c.set(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
 					date = c.getTime();
-					netAmount = textFieldNetAmount.getText().toString();
-					vatAmount = textFieldVatAmount.getText().toString();
-					grossAmount = textFieldGrossAmount.getText().toString();
+					netAmount1 = textFieldNet1.getText().toString();
+					vatAmount1 = textFieldVat1.getText().toString();
+					netAmount2 = textFieldNet2.getText().toString();
+					vatAmount2 = textFieldVat2.getText().toString();
+					netAmount3 = textFieldNet3.getText().toString();
+					vatAmount3 = textFieldVat3.getText().toString();
+					netAmount4 = textFieldNet4.getText().toString();
+					vatAmount4 = textFieldVat4.getText().toString();
+					netAmount5 = textFieldNet5.getText().toString();
+					vatAmount5 = textFieldVat5.getText().toString();
+					netSum = Double.valueOf(netAmount1.replace(',', '.')) + Double.valueOf(netAmount2.replace(',', '.')) + Double.valueOf(netAmount3.replace(',', '.')) + Double.valueOf(netAmount4.replace(',', '.')) + Double.valueOf(netAmount5.replace(',', '.'));
+					vatSum = Double.valueOf(vatAmount1.replace(',', '.')) + Double.valueOf(vatAmount2.replace(',', '.')) + Double.valueOf(vatAmount3.replace(',', '.')) + Double.valueOf(vatAmount4.replace(',', '.')) + Double.valueOf(vatAmount5.replace(',', '.'));
+					grossAmount = String.valueOf(netSum + vatSum).replace('.', ',');
 					description = textAreaDescription.getText().toString();
 					nameContractor = comboBoxNameContractor.getSelectionModel().getSelectedItem();
 					addressContractor = textFieldAddressContractor.getText().toString();
@@ -149,7 +185,7 @@ public class NewDocumentsVatController {
 					Double amount = Double.valueOf(grossAmount.replace(',', '.'));
 					if(documentType.equals("zakup œrodków trwa³ych")) {
 						if(amount > 3500) {
-							if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
+							if(addNewDocument(conn, numberDocument, documentType, date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor)) {
 								FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
 					            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 					            Scene scene = new Scene(loader.load());
@@ -167,7 +203,7 @@ public class NewDocumentsVatController {
 						}
 					} else if(documentType.equals("zakup wyposa¿enia")) {
 								if(amount > 1500) {
-									if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor) && addNewDocument(conn, numberDocument, "zakupy/wydatki", date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
+									if(addNewDocument(conn, numberDocument, documentType, date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor) && addNewDocument(conn, numberDocument, "zakupy/wydatki", date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor)) {
 										FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
 							            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 							            Scene scene = new Scene(loader.load());
@@ -184,14 +220,14 @@ public class NewDocumentsVatController {
 							textError.setText("Kwota wyposa¿enia musi przekroczyæ 1500 z³");
 						}
 					} else {
-						if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
-							FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+						if(addNewDocument(conn, numberDocument, documentType, date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor)) {
+							FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
 				            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 				            Scene scene = new Scene(loader.load());
 							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 				            stage.setScene(scene);
-				            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-				            newDocumentsController.initData(id_uzytkownik, year, month);
+				            NewDocumentsVatController newDocumentsVatController = loader.<NewDocumentsVatController>getController();
+				            newDocumentsVatController.initData(id_uzytkownik, year, month);
 				            stage.setResizable(false);
 				            stage.show();
 						} else {
@@ -206,7 +242,11 @@ public class NewDocumentsVatController {
 			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 			conn = openConnection(connStr);
 				if(createExcel(conn)) {
-					
+					if(createExcelWithVat(conn)) {
+						
+					} else {
+						textError.setText("Wyst¹pi³ b³¹d, nie utworzono pliku z VAT");
+					}
 				} else {
 					textError.setText("Wyst¹pi³ b³¹d, nie utworzono pliku");
 				}	
@@ -271,6 +311,7 @@ public class NewDocumentsVatController {
 		ArrayList<String> documentTypes = new ArrayList<>();
 		Month monthModel = null;
 		int monthNumber = monthsMap.get(month);
+		Double netAmount = 0.00;
 		Double incomeSum = 0.00;
 		Double rewardSum = 0.00;
 		Double expenseSum = 0.00;
@@ -283,7 +324,7 @@ public class NewDocumentsVatController {
 			try {
 				String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
 						+ "dokument_ksiegowy.data, kontrahent.nazwa, kontrahent.adres, "
-						+ "dokument_ksiegowy.opis, dokument_ksiegowy.kwota_brutto, dokument_ksiegowy.kwota_netto, dokument_ksiegowy.kwota_vat "
+						+ "dokument_ksiegowy.opis, dokument_ksiegowy.id_dokument_ksiegowy "
 				+ "from dokument_ksiegowy, miesiac, uzytkownik, rok, typ_dokumentu, kontrahent " 
 				+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
 				+ "and dokument_ksiegowy.id_miesiac = miesiac.id_miesiac "
@@ -300,6 +341,7 @@ public class NewDocumentsVatController {
 				int i = 1;
 				while(rs.next()) {
 					if(!rs.getString(1).equals("zakup œrodków trwa³ych") && !rs.getString(1).equals("zakup wyposa¿enia")) {
+						netAmount = 0.0;
 						map.put("lp" + i, "" + rs.getInt(2));
 						map.put("date" + i, rs.getString(4));
 						map.put("number" + i, rs.getString(3));
@@ -307,10 +349,25 @@ public class NewDocumentsVatController {
 						map.put("addressC" + i, rs.getString(6));
 						map.put("description" + i, rs.getString(7));
 						
+						try {
+							String query_net = String.format("select kwota_netto.wartosc "
+									+ "from dokument_ksiegowy, kwota_netto, dokument_kwota_netto " 
+							+ "where dokument_kwota_netto.id_kwota_netto = kwota_netto.id_kwota_netto "
+							+ "and dokument_kwota_netto.id_dokument_ksiegowy = dokument_ksiegowy.id_dokument_ksiegowy "
+							+ "and dokument_ksiegowy.id_dokument_ksiegowy = '%d' ", rs.getInt(8));
+							Statement stm_net = conn.createStatement();
+							ResultSet rs_net = stm_net.executeQuery(query_net);
+							while(rs_net.next()) {
+								netAmount += rs_net.getDouble(1);
+							}
+						} catch(SQLException ex) {
+							System.out.println("B³¹d pobierania danych o kwocie netto: " + ex);
+						}
+						
 						if(rs.getString(1).equals("przychody")) {
-							map.put("income" + i, rs.getString(9).replace('.', ','));
+							map.put("income" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("incomeR" + i, "");
-							map.put("incomeS" + i, rs.getString(9).replace('.', ','));
+							map.put("incomeS" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
@@ -320,69 +377,70 @@ public class NewDocumentsVatController {
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							incomeSum += rs.getDouble(9);
+							incomeSum += netAmount;
 							
 						} else if(rs.getString(1).equals("wynagrodzenia")) {
-							map.put("rewards" + i, rs.getString(9).replace('.', ','));
+							map.put("rewards" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("expenseR" + i, "");
-							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
+							map.put("expenseS" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							rewardSum += rs.getDouble(9);
+							rewardSum += netAmount;
 							
 						} else if(rs.getString(1).equals("zakupy/wydatki") || rs.getString(1).equals("import us³ug i WNT") || rs.getString(1).equals("pozosta³e wydatki/dowody wewnêtrzne")) {
-							map.put("expenseR" + i, rs.getString(9).replace('.', ','));
+							map.put("expenseR" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("buyG" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
-							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
+							map.put("expenseS" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							expenseSum += rs.getDouble(9);
+							expenseSum += netAmount;
 							
 						} else if(rs.getString(1).equals("zakup towarów i materia³ów") || rs.getString(1).equals("import towarów i WNT")) {
-							map.put("buyG" + i, rs.getString(9).replace('.', ','));
+							map.put("buyG" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("expenseR" + i, "");
 							map.put("expenseIn" + i, "");
 							map.put("rewards" + i, "");
-							map.put("expenseS" + i, rs.getString(9).replace('.', ','));
+							map.put("expenseS" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							boughtGoodsSum += rs.getDouble(9);
+							boughtGoodsSum += netAmount;
+							
 						} else if(rs.getString(1).equals("koszty uboczne zakupu"))	{
-							map.put("expenseIn" + i, rs.getString(9).replace('.', ','));
+							map.put("expenseIn" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("income" + i, "");
 							map.put("incomeR" + i, "");
 							map.put("incomeS" + i, "0,00");
 							map.put("buyG" + i, "");
 							map.put("rewards" + i, "");
 							map.put("expenseR" + i, "");
-							map.put("expenseS" + i, rs.getString(8).replace('.', ','));
+							map.put("expenseS" + i, String.format("%.2f", netAmount).replace('.', ','));
 							map.put("expenseResearchD" + i, "");
 							map.put("expenseResearch" + i, "");
 							map.put("comment" + i, "");
 							
-							expenseInSum += rs.getDouble(9);
+							expenseInSum += netAmount;
 						}
-					}
-				i++;	 
+						i++;
+					}	 
 				}
 			} catch(SQLException ex) {
 				System.out.println("B³¹d pobierania danych o dokumentach: " + ex);
@@ -456,17 +514,22 @@ public class NewDocumentsVatController {
 					
 					mapTax.put("resultSumRounded", String.format("%d", finalResultSum.intValue()));
 					
+					String taxScaleRate = "";
 					if(finalResultSum > 0) {
 						if(taxWay.equals("zasady ogólne")) {
 							if(finalResultSum < 85528) {
 								tax = finalResultSum * 0.18;
+								taxScaleRate = "18%";
 							} else {
 								tax = finalResultSum * 0.32;
+								taxScaleRate = "32%";
 							}	
 						} else if(taxWay.equals("podatek liniowy")) {
 							tax = finalResultSum * 0.19;
+							taxScaleRate = "19%";
 						}
-						
+						 
+						mapTax.put("taxScaleRate", "Podatek nale¿ny wed³ug skali " + taxScaleRate);
 						mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
 						mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
 						mapTax.put("healthIns", String.format("%.2f", 255.99).replace('.', ','));
@@ -557,21 +620,211 @@ public class NewDocumentsVatController {
 					}
 				}
 				
-				ExcelCreation createLedger = new ExcelCreation(System.getenv("userprofile") + "/Desktop/PD/template3.xlsx", 0, System.getenv("userprofile") + "/Desktop/PD/out.xlsx", month + " " + year, map, month + " " + year);
+				ExcelCreation createLedger = new ExcelCreation(System.getProperty("user.dir") + "/Templates/template_kpir.xlsx" , 0, System.getProperty("user.dir") + "/CreatedFiles/KPIR_" + year + "_" + getUserNip(conn) + ".xlsx", month + " " + year, map, month + " " + year);
 			    createLedger.doExcel();
 			    
-			    BigDecimal bgFinalTax = new BigDecimal(String.valueOf(finalTax.intValue()));
-			    
-			    if(updateMonthWithTax(conn, bgFinalTax)) {
-			    	ExcelCreation createTax = new ExcelCreation(System.getenv("userprofile") + "/Desktop/PD/template_podatek.xlsx", 0, System.getenv("userprofile") + "/Desktop/PD/outPodatek.xlsx", month + " " + year, mapTax, month + " " + year);
-				    createTax.doExcel();
-			    	value = true;
+			    if(updateLedgerWithName(conn, "KPIR_" + year + "_" + getUserNip(conn) + ".xlsx")) {
+			    	BigDecimal bgFinalTax = new BigDecimal(String.valueOf(finalTax.intValue()));
+				    
+				    if(updateMonthWithTax(conn, bgFinalTax)) {
+				    	ExcelCreation createTax = new ExcelCreation(System.getProperty("user.dir") + "/Templates/template_podatek.xlsx", 0, System.getProperty("user.dir") + "/CreatedFiles/ZALICZKA_" + year + "_" + getUserNip(conn) + ".xlsx", month + " " + year, mapTax, month + " " + year);
+					    createTax.doExcel();
+				    	value = true;
+				    } else {
+				    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem");
+				    }
 			    } else {
-			    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem");
+			    	System.out.println("Nie zaktualizowano tabeli rok z nazw¹");
 			    }
 			} else {
 				System.out.println("Nie zaktualizowano tabeli miesiac");
 			}
+		return value;
+	}
+	
+	private Boolean createExcelWithVat(Connection conn) {
+		Boolean value = false;
+		Map<String, Object> map = new HashMap<String, Object>();
+		int monthNumber = monthsMap.get(month);
+		Double netAD = 0.00;
+		Double vatAD = 0.00;
+		Double netAC = 0.00;
+		Double vatAC = 0.00;
+		Double totalSumNetD1 = 0.00;
+		Double totalSumVatD1 = 0.00;
+		Double totalSumNetD2 = 0.00;
+		Double totalSumVatD2 = 0.00;
+		Double totalSumNetD3 = 0.00;
+		Double totalSumVatD3 = 0.00;
+		Double totalSumNetD4 = 0.00;
+		Double totalSumVatD4 = 0.00;
+		
+		Double totalSumNetC1 = 0.00;
+		Double totalSumVatC1 = 0.00;
+		Double totalSumNetC2 = 0.00;
+		Double totalSumVatC2 = 0.00;
+		Double totalSumNetC3 = 0.00;
+		Double totalSumVatC3 = 0.00;
+		Double totalSumNetC4 = 0.00;
+		Double totalSumVatC4 = 0.00;
+
+		try {
+			String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
+					+ "dokument_ksiegowy.data, kontrahent.nazwa, kontrahent.adres, "
+					+ "dokument_ksiegowy.opis, dokument_ksiegowy.id_dokument_ksiegowy "
+			+ "from dokument_ksiegowy, miesiac, uzytkownik, rok, typ_dokumentu, kontrahent " 
+			+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
+			+ "and dokument_ksiegowy.id_miesiac = miesiac.id_miesiac "
+			+ "and miesiac.id_rok = rok.id_rok "
+			+ "and dokument_ksiegowy.id_typ_dokumentu = typ_dokumentu.id_typ_dokumentu "
+			+ "and dokument_ksiegowy.id_kontrahent = kontrahent.id_kontrahent "
+			+ "and uzytkownik.id_uzytkownik = '%d' "
+			+ "and month(miesiac.data) = '%d' "
+			+ "and typ_dokumentu.nazwa != 'zakup œrodków trwa³ych' "
+			+ "and typ_dokumentu.nazwa != 'zakup wyposa¿enia' "
+			+ "and year(rok.data) = '%s'", id_uzytkownik, monthNumber, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			int i = 1;
+			int j = 1;
+			while(rs.next()) {
+				if(!rs.getString(1).equals("zakup œrodków trwa³ych") && !rs.getString(1).equals("zakup wyposa¿enia")) {
+					try {
+						String query_net = String.format("select kwota_netto.wartosc, kwota_vat.wartosc, stawka_podatku.wartosc "
+								+ "from dokument_ksiegowy, kwota_netto, dokument_kwota_netto, kwota_vat, dokument_kwota_vat, stawka_podatku " 
+						+ "where dokument_kwota_netto.id_kwota_netto = kwota_netto.id_kwota_netto "
+						+ "and dokument_kwota_netto.id_dokument_ksiegowy = dokument_ksiegowy.id_dokument_ksiegowy "
+						+ "and dokument_kwota_vat.id_kwota_vat = kwota_vat.id_kwota_vat "
+						+ "and dokument_kwota_vat.id_dokument_ksiegowy = dokument_ksiegowy.id_dokument_ksiegowy "
+						+ "and kwota_netto.id_stawka_podatku = stawka_podatku.id_stawka_podatku "
+						+ "and kwota_vat.id_stawka_podatku = stawka_podatku.id_stawka_podatku "
+						+ "and stawka_podatku.wartosc != 'zwolniona' "
+						+ "and dokument_ksiegowy.id_dokument_ksiegowy = '%d' ", rs.getInt(8));
+						Statement stm_net = conn.createStatement();
+						ResultSet rs_net = stm_net.executeQuery(query_net);
+						while(rs_net.next()) {
+							if(rs.getString(1).equals("przychody")) {
+								if(rs_net.getString(3).equals("23")) {
+									totalSumNetD1 += rs_net.getDouble(1);
+									totalSumVatD1 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("8")) {
+									totalSumNetD2 += rs_net.getDouble(1);
+									totalSumVatD2 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("5")) {
+									totalSumNetD3 += rs_net.getDouble(1);
+									totalSumVatD3 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("0")) {
+									totalSumNetD4 += rs_net.getDouble(1);
+									totalSumVatD4 += rs_net.getDouble(2);
+								}
+								map.put("lpD" + i, "" + rs.getInt(2));
+								map.put("dateD" + i, rs.getString(4));
+								map.put("numberD" + i, rs.getString(3));
+								map.put("nameCD" + i, rs.getString(5));
+								map.put("descriptionD" + i, rs.getString(7));
+								map.put("taxD" + i, rs_net.getString(3));
+								map.put("netAD" + i, rs_net.getString(1).replace('.', ','));
+								map.put("vatAD" + i, rs_net.getString(2).replace('.', ','));
+								netAD += rs_net.getDouble(1);
+								vatAD += rs_net.getDouble(2);
+								i++;
+							} else {
+								if(rs_net.getString(3).equals("23")) {
+									totalSumNetC1 += rs_net.getDouble(1);
+									totalSumVatC1 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("8")) {
+									totalSumNetC2 += rs_net.getDouble(1);
+									totalSumVatC2 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("5")) {
+									totalSumNetC3 += rs_net.getDouble(1);
+									totalSumVatC3 += rs_net.getDouble(2);
+								} else if(rs_net.getString(3).equals("0")) {
+									totalSumNetC4 += rs_net.getDouble(1);
+									totalSumVatC4 += rs_net.getDouble(2);
+								}
+								map.put("lpC" + j, "" + rs.getInt(2));
+								map.put("dateC" + j, rs.getString(4));
+								map.put("numberC" + j, rs.getString(3));
+								map.put("nameCC" + j, rs.getString(5));
+								map.put("descriptionC" + j, rs.getString(7));
+								map.put("taxC" + j, rs_net.getString(3));
+								map.put("netAC" + j, rs_net.getString(1).replace('.', ','));
+								map.put("vatAC" + j, rs_net.getString(2).replace('.', ','));
+								netAC += rs_net.getDouble(1);
+								vatAC += rs_net.getDouble(2);
+								j++;
+							}
+						}
+					} catch(SQLException ex) {
+						System.out.println("B³¹d pobierania danych o kwotach: " + ex);
+					}
+				}
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o dokumentach: " + ex);
+		}
+		map.put("sumNetD", String.format("%.2f", netAD).replace('.', ','));
+		map.put("sumVatD", String.format("%.2f", vatAD).replace('.', ','));
+		map.put("sumNetC", String.format("%.2f", netAC).replace('.', ','));
+		map.put("sumVatC", String.format("%.2f", vatAC).replace('.', ','));
+		
+		map.put("totalSumNetD1", String.format("%.2f", totalSumNetD1).replace('.', ','));
+		map.put("totalSumVatD1", String.format("%.2f", totalSumVatD1).replace('.', ','));
+		map.put("totalSumGrosD1", String.format("%.2f", totalSumNetD1 + totalSumVatD1).replace('.', ','));
+		map.put("totalSumNetD2", String.format("%.2f", totalSumNetD2).replace('.', ','));
+		map.put("totalSumVatD2", String.format("%.2f", totalSumVatD2).replace('.', ','));
+		map.put("totalSumGrosD2", String.format("%.2f", totalSumNetD2 + totalSumVatD2).replace('.', ','));
+		map.put("totalSumNetD3", String.format("%.2f", totalSumNetD3).replace('.', ','));
+		map.put("totalSumVatD3", String.format("%.2f", totalSumVatD3).replace('.', ','));
+		map.put("totalSumGrosD3", String.format("%.2f", totalSumNetD3 + totalSumVatD3).replace('.', ','));
+		map.put("totalSumNetD4", String.format("%.2f", totalSumNetD4).replace('.', ','));
+		map.put("totalSumVatD4", String.format("%.2f", totalSumVatD4).replace('.', ','));
+		map.put("totalSumGrosD4", String.format("%.2f", totalSumNetD4 + totalSumVatD4).replace('.', ','));
+		
+		Double totalSumNetD = totalSumNetD1 + totalSumNetD2 + totalSumNetD3 + totalSumNetD4;
+		Double totalSumVatD = totalSumVatD1 + totalSumVatD2 + totalSumVatD3 + totalSumVatD4;
+		Double totalSumGrosD = totalSumNetD1 + totalSumVatD1 + totalSumNetD2 + totalSumVatD2 + totalSumNetD3 + totalSumVatD3 + totalSumNetD4 + totalSumVatD4;
+		
+		map.put("totalSumNetD", String.format("%.2f", totalSumNetD).replace('.', ','));
+		map.put("totalSumVatD", String.format("%.2f", totalSumVatD).replace('.', ','));
+		map.put("totalSumGrosD", String.format("%.2f", totalSumGrosD).replace('.', ','));
+		
+		map.put("totalSumNetC1", String.format("%.2f", totalSumNetC1).replace('.', ','));
+		map.put("totalSumVatC1", String.format("%.2f", totalSumVatC1).replace('.', ','));
+		map.put("totalSumGrosC1", String.format("%.2f", totalSumNetC1 + totalSumVatC1).replace('.', ','));
+		map.put("totalSumNetC2", String.format("%.2f", totalSumNetC2).replace('.', ','));
+		map.put("totalSumVatC2", String.format("%.2f", totalSumVatC2).replace('.', ','));
+		map.put("totalSumGrosC2", String.format("%.2f", totalSumNetC2 + totalSumVatC2).replace('.', ','));
+		map.put("totalSumNetC3", String.format("%.2f", totalSumNetC3).replace('.', ','));
+		map.put("totalSumVatC3", String.format("%.2f", totalSumVatC3).replace('.', ','));
+		map.put("totalSumGrosC3", String.format("%.2f", totalSumNetC3 + totalSumVatC3).replace('.', ','));
+		map.put("totalSumNetC4", String.format("%.2f", totalSumNetC4).replace('.', ','));
+		map.put("totalSumVatC4", String.format("%.2f", totalSumVatC4).replace('.', ','));
+		map.put("totalSumGrosC4", String.format("%.2f", totalSumNetC4 + totalSumVatC4).replace('.', ','));
+		
+		Double totalSumNetC = totalSumNetC1 + totalSumNetC2 + totalSumNetC3 + totalSumNetC4;
+		Double totalSumVatC = totalSumVatC1 + totalSumVatC2 + totalSumVatC3 + totalSumVatC4;
+		Double totalSumGrosC = totalSumNetC1 + totalSumVatC1 + totalSumNetC2 + totalSumVatC2 + totalSumNetC3 + totalSumVatC3 + totalSumNetC4 + totalSumVatC4;
+		
+		map.put("totalSumNetC", String.format("%.2f", totalSumNetC).replace('.', ','));
+		map.put("totalSumVatC", String.format("%.2f", totalSumVatC).replace('.', ','));
+		map.put("totalSumGrosC", String.format("%.2f", totalSumGrosC).replace('.', ','));
+		if(totalSumVatD - totalSumVatC > 0) {
+			map.put("finalVat", String.format("%.2f", totalSumVatD - totalSumVatC).replace('.', ','));
+		} else {
+			map.put("finalVat", String.format("%.2f", 0.00).replace('.', ','));
+		}
+		
+		BigDecimal bgTotalSumVatD = new BigDecimal(String.valueOf(totalSumVatD.intValue()));
+		BigDecimal bgTotalSumVatC = new BigDecimal(String.valueOf(totalSumVatC.intValue()));
+		
+		if(updateMonthWithTaxVat(conn, bgTotalSumVatD, bgTotalSumVatC)) {
+			ExcelCreation createLedger = new ExcelCreation(System.getProperty("user.dir") + "/Templates/template_vat.xlsx" , 0, System.getProperty("user.dir") + "/CreatedFiles/VAT_" + year + "_" + getUserNip(conn) + ".xlsx", month + " " + year, map, month + " " + year);
+		    createLedger.doExcel();
+	    	value = true;
+	    } else {
+	    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem VAT");
+	    }
 		return value;
 	}
 	
@@ -580,8 +833,8 @@ public class NewDocumentsVatController {
 		int monthNumber = monthsMap.get(month);
 			try {
 				String query = String.format("update miesiac set podatek = '%s' "
-						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
-						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", tax, monthNumber, year); 
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", tax, id_uzytkownik, monthNumber, year); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -591,6 +844,42 @@ public class NewDocumentsVatController {
 				result = false;
 			}
 		
+		return result;
+	}
+	
+	private Boolean updateLedgerWithName(Connection conn, String name) {
+		Boolean result = false;
+			try {
+				String query = String.format("update rok set nazwa = '%s' "
+						+ "where id_rok = (select rok.id_rok from rok, uzytkownik where uzytkownik.id_uzytkownik = rok.id_uzytkownik "
+						+ "and uzytkownik.id_uzytkownik = '%d' and year(rok.data) = '%s')", name, id_uzytkownik, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+		
+		return result;
+	}
+	
+	private Boolean updateMonthWithTaxVat(Connection conn, BigDecimal taxD, BigDecimal taxC) {
+		Boolean result = false;
+		int monthNumber = monthsMap.get(month);
+			try {
+				String query = String.format("update miesiac set vat_nalezny = '%s', vat_naliczony = '%s' "
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", taxD, taxC, id_uzytkownik, monthNumber, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
 		return result;
 	}
 	
@@ -686,8 +975,8 @@ public class NewDocumentsVatController {
 			try {
 				String query = String.format("update miesiac set suma_wartosc_sprz_towar = '%s', suma_poz_przych = '%s', suma_zak_towar = '%s', "
 						+ "suma_koszt_ub = '%s', suma_wynagrodzen = '%s', suma_wydatkow = '%s', suma_koszt_bad_rozw = '%s', lp = %d "
-						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
-						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn), monthNumber, year); 
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn), id_uzytkownik, monthNumber, year); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -715,7 +1004,7 @@ public class NewDocumentsVatController {
 		return result;
 	}
 	
-	private Boolean addNewDocument(Connection conn, String numberDocument, String documentType, Date date, String netAmount, String vatAmount, String grossAmount, String description, String nameContractor, String addressContractor) {
+	private Boolean addNewDocument(Connection conn, String numberDocument, String documentType, Date date, String netAmount1, String vatAmount1, String netAmount2, String vatAmount2, String netAmount3, String vatAmount3, String netAmount4, String vatAmount4, String netAmount5, String vatAmount5, String grossAmount, String description, String nameContractor, String addressContractor) {
 		Boolean result;
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		System.out.println(dateFormat.format(date));
@@ -723,6 +1012,7 @@ public class NewDocumentsVatController {
 		int idMonth = getIdMonth(conn);
 		int orderNumber = 0;
 		int idContractor = 0; 
+		int idDocument = 0;
 		idContractor = getIdContractor(conn, nameContractor, addressContractor);
 		if(idContractor==0) {
 			idContractor = addContractor(conn, nameContractor, addressContractor);
@@ -736,31 +1026,415 @@ public class NewDocumentsVatController {
 			orderNumber = getOrderNumberFromLastMonth(conn) + getDocumentOrderNumber(conn) + 1;
 		}
 		
-		BigDecimal netA;
+		BigDecimal netA1;
+		BigDecimal netA2;
+		BigDecimal netA3;
+		BigDecimal netA4;
+		BigDecimal netA5;
 		BigDecimal grossA;
-		BigDecimal vatA;
+		BigDecimal vatA1;
+		BigDecimal vatA2;
+		BigDecimal vatA3;
+		BigDecimal vatA4;
+		BigDecimal vatA5;
 		String strGrossAmount = grossAmount.replaceAll(",",".");
 		System.out.println(strGrossAmount);
 		grossA = new BigDecimal(strGrossAmount);
 		System.out.println(grossA);
-			String strNetAmount=netAmount.replaceAll(",",".");
-			netA = new BigDecimal(strNetAmount);
-			String strVatAmount = vatAmount.replaceAll(",",".");
-			vatA = new BigDecimal(strVatAmount);
+			netA1 = new BigDecimal(netAmount1.replaceAll(",","."));
+			netA1 = netA1.setScale(2, RoundingMode.HALF_UP);
+			vatA1 = new BigDecimal(vatAmount1.replaceAll(",","."));
+			vatA1 = vatA1.setScale(2, RoundingMode.HALF_UP);
+			netA2 = new BigDecimal(netAmount2.replaceAll(",","."));
+			netA2 = netA2.setScale(2, RoundingMode.HALF_UP);
+			vatA2 = new BigDecimal(vatAmount2.replaceAll(",","."));
+			vatA2 = vatA2.setScale(2, RoundingMode.HALF_UP);
+			netA3 = new BigDecimal(netAmount3.replaceAll(",","."));
+			netA3 = netA3.setScale(2, RoundingMode.HALF_UP);
+			vatA3 = new BigDecimal(vatAmount3.replaceAll(",","."));
+			vatA3 = vatA3.setScale(2, RoundingMode.HALF_UP);
+			netA4 = new BigDecimal(netAmount4.replaceAll(",","."));
+			netA4 = netA4.setScale(2, RoundingMode.HALF_UP);
+			vatA4 = new BigDecimal(vatAmount4.replaceAll(",","."));
+			vatA4 = vatA4.setScale(2, RoundingMode.HALF_UP);
+			netA5 = new BigDecimal(netAmount5.replaceAll(",","."));
+			netA5 = netA5.setScale(2, RoundingMode.HALF_UP);
+			vatA5 = new BigDecimal(vatAmount5.replaceAll(",","."));
+			vatA5 = vatA5.setScale(2, RoundingMode.HALF_UP);
 			try {
 				String query = String.format("insert into dokument_ksiegowy(id_uzytkownik, id_typ_dokumentu, id_miesiac, id_kontrahent, numer, data, "
-						+ "kwota_netto, kwota_brutto, opis, kwota_vat, lp) "
-						+ "values('%d','%d','%d','%d','%s','%s','%f','%f','%s','%f','%d')", 
-						id_uzytkownik, idDocumentType, idMonth, idContractor, numberDocument, dateFormat.format(date), netA, grossA, description, vatA, orderNumber); 
+						+ "kwota_brutto, opis, lp) "
+						+ "values('%d','%d','%d','%d','%s','%s','%s','%s','%d')", 
+						id_uzytkownik, idDocumentType, idMonth, idContractor, numberDocument, dateFormat.format(date), grossA, description, orderNumber); 
 				Statement stm = conn.createStatement();
-				int count = stm.executeUpdate(query);
-				System.out.println("Liczba dodanych rekordów " + count);
+				idDocument = stm.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+				ResultSet rs = stm.getGeneratedKeys();
+				if (rs.next()){
+				    idDocument=rs.getInt(1);
+				}
+				System.out.println("Id dokumentu" + idDocument);
 				result = true;
 			} catch (SQLException e) {
 				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
 				result = false;
 			}
+			if(netA1.compareTo(BigDecimal.ZERO) != 0) {
+				if(netA2.compareTo(BigDecimal.ZERO) != 0) {
+					if(netA3.compareTo(BigDecimal.ZERO) != 0) {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					} else {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					}
+				} else {
+					if(netA3.compareTo(BigDecimal.ZERO) != 0) {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1)  
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1)  
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1)  
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					} else {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1)  
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 1, netA1) && insertVatAmountToDocument(conn, idDocument, 1, vatA1)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if(netA2.compareTo(BigDecimal.ZERO) != 0) {
+					if(netA3.compareTo(BigDecimal.ZERO) != 0) {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2) 
+										&& insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					} else {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)  
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 2, netA2) && insertVatAmountToDocument(conn, idDocument, 2, vatA2)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					}
+				} else {
+					if(netA3.compareTo(BigDecimal.ZERO) != 0) {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 3, netA3) && insertVatAmountToDocument(conn, idDocument, 3, vatA3)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						}
+					} else {
+						if(netA4.compareTo(BigDecimal.ZERO) != 0) {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4) 
+										&& insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+								if(insertNetAmountToDocument(conn, idDocument, 4, netA4) && insertVatAmountToDocument(conn, idDocument, 4, vatA4)) {
+								
+								} else {
+									result = false;
+								}
+							}
+						} else {
+							if(netA5.compareTo(BigDecimal.ZERO) != 0) {
+								if(insertNetAmountToDocument(conn,idDocument, 5, netA5) && insertVatAmountToDocument(conn, idDocument, 5, vatA5)) {
+								
+								} else {
+									result = false;
+								}
+							} else {
+									result = false;
+							}
+						}
+					}
+				}
+			}
 		return result;
+	}
+	
+	private Boolean insertNetAmountToDocument(Connection conn, int idDocument, int idTax, BigDecimal netAmount) {
+		Boolean value = false;
+		int idAmount = 0;
+		try {
+			String query = String.format("insert into kwota_netto (id_stawka_podatku, wartosc) "
+					+ "values('%d', '%s')", idTax, netAmount); 
+			Statement stm = conn.createStatement();
+			idAmount = stm.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stm.getGeneratedKeys();
+			if (rs.next()){
+			    idAmount=rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+		}
+		try {
+			String query = String.format("insert into dokument_kwota_netto (id_dokument_ksiegowy, id_kwota_netto) "
+					+ "values('%d', '%d')", idDocument, idAmount); 
+			Statement stm = conn.createStatement();
+			int count = stm.executeUpdate(query);
+			System.out.println("Ilosc dodanych rekordow" + count);
+			value = true;
+		} catch (SQLException e) {
+			System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+			value = false;
+		}
+		return value;
+	}
+	
+	private Boolean insertVatAmountToDocument(Connection conn, int idDocument, int idTax, BigDecimal vatAmount) {
+		Boolean value = false;
+		int idAmount = 0;
+		try {
+			String query = String.format("insert into kwota_vat (id_stawka_podatku, wartosc) "
+					+ "values('%d', '%s')", idTax, vatAmount); 
+			Statement stm = conn.createStatement();
+			idAmount = stm.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stm.getGeneratedKeys();
+			if (rs.next()){
+			    idAmount=rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+		}
+		try {
+			String query = String.format("insert into dokument_kwota_vat (id_dokument_ksiegowy, id_kwota_vat) "
+					+ "values('%d', '%d')", idDocument, idAmount); 
+			Statement stm = conn.createStatement();
+			int count = stm.executeUpdate(query);
+			System.out.println("Ilosc dodanych rekordow " + count);
+			value = true;
+		} catch (SQLException e) {
+			System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+			value = false;
+		}
+		return value;
 	}
 	
 	private int getIdDocumentType(Connection conn, String nazwa) {
@@ -920,12 +1594,12 @@ public class NewDocumentsVatController {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if(newValue.equals("zakup œrodków trwa³ych")) {
-					textFieldGrossAmount.setPromptText("Kwota musi przekroczyæ 3500 z³");
-					textError.setText("Amortyzacja w szczegó³ach dokumentu");
-					textAreaDescription.setText("");
+					textError.setText("Amortyzacja w szczegó³ach, kwota > 3500 z³");
+					Tooltip tooltipDes = new Tooltip();
+					tooltipDes.setText("Przyk³adowo samochód - typ, marka, pojemnoœæ silnika,\n numer rejestracyjny, numer podwozia/nadwozia,\n rok produkcji");
+					textAreaDescription.setTooltip(tooltipDes);
 				} else if(newValue.equals("zakup wyposa¿enia")) {
-					textFieldGrossAmount.setPromptText("Kwota musi przekroczyæ 1500 z³");
-					textError.setText("U¿ytkowanie nied³u¿sze ni¿ rok");
+					textError.setText("U¿ytkowanie poni¿ej roku, kwota > 1500 z³");
 				}
 			}
 		});
@@ -949,7 +1623,7 @@ public class NewDocumentsVatController {
 	private void setAmountFields() {
 		DecimalFormat format = new DecimalFormat( "#.00" );
 
-		textFieldNetAmount.setTextFormatter( new TextFormatter<>(c ->
+		textFieldNet1.setTextFormatter( new TextFormatter<>(c ->
 		{
 		    if ( c.getControlNewText().isEmpty() )
 		    {
@@ -968,7 +1642,7 @@ public class NewDocumentsVatController {
 		        return c;
 		    }
 		}));
-		textFieldGrossAmount.setTextFormatter( new TextFormatter<>(c ->
+		textFieldVat1.setTextFormatter( new TextFormatter<>(c ->
 		{
 		    if ( c.getControlNewText().isEmpty() )
 		    {
@@ -987,7 +1661,7 @@ public class NewDocumentsVatController {
 		        return c;
 		    }
 		}));
-		textFieldVatAmount.setTextFormatter( new TextFormatter<>(c ->
+		textFieldNet2.setTextFormatter( new TextFormatter<>(c ->
 		{
 		    if ( c.getControlNewText().isEmpty() )
 		    {
@@ -1006,6 +1680,186 @@ public class NewDocumentsVatController {
 		        return c;
 		    }
 		}));
+		textFieldVat2.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldNet3.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldVat3.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldNet4.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldVat4.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldNet5.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldVat5.setTextFormatter( new TextFormatter<>(c ->
+		{
+		    if ( c.getControlNewText().isEmpty() )
+		    {
+		        return c;
+		    }
+
+		    ParsePosition parsePosition = new ParsePosition( 0 );
+		    Object object = format.parse( c.getControlNewText(), parsePosition );
+
+		    if ( object == null || parsePosition.getIndex() < c.getControlNewText().length() )
+		    {
+		        return null;
+		    }
+		    else
+		    {
+		        return c;
+		    }
+		}));
+		textFieldNet1.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(!newValue.isEmpty()) {
+					textFieldVat1.setText(String.format("%.2f", Double.valueOf(newValue.replace(',', '.')) * 0.23).replace('.', ','));
+				}
+			}
+			
+		});
+		textFieldNet2.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(!newValue.isEmpty()) {
+					textFieldVat2.setText(String.format("%.2f", Double.valueOf(newValue.replace(',', '.')) * 0.08).replace('.', ','));
+				}
+			}
+			
+		});
+		textFieldNet3.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if(!newValue.isEmpty()) {
+					textFieldVat3.setText(String.format("%.2f", Double.valueOf(newValue.replace(',', '.')) * 0.05).replace('.', ','));
+				}
+				
+			}
+			
+		});
+		textFieldNet4.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				textFieldVat4.setText("0,00");
+			}
+			
+		});
+		textFieldNet5.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				textFieldVat5.setText("0,00");
+			}
+			
+		});
 	}
 	
 	private ArrayList<DocumentTable> getDocuments(Connection conn, int month) {
@@ -1032,6 +1886,21 @@ public class NewDocumentsVatController {
 			System.out.println("B³¹d pobierania danych o dokumentach: " + ex);
 		}
 		return documents;
+	}
+	
+	private String getUserNip(Connection conn) {
+		String nip = "";
+		try {
+			String query = String.format("select nip from uzytkownik where id_uzytkownik = '%d'", id_uzytkownik);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				nip = rs.getString(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o u¿ytkowniku: " + ex);
+		}
+		return nip;
 	}
 	
 	private ArrayList<String> getDocumentTypes(Connection conn) {

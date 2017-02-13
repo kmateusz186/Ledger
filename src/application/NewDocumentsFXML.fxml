@@ -65,7 +65,7 @@
             </Button>
             <Label text="Numer dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <TextField fx:id="textFieldNumberDocument" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -75,7 +75,7 @@
             </TextField>
             <Label text="Typ dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <ChoiceBox fx:id="choiceBoxDocumentTypes" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
@@ -85,7 +85,7 @@
             </ChoiceBox>
             <Label text="Data" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <DatePicker fx:id="datePickerDateDocument" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
@@ -95,7 +95,7 @@
             </DatePicker>
             <Label text="Kwota brutto" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <TextField fx:id="textFieldGrossAmount" GridPane.columnIndex="1" GridPane.rowIndex="4">
@@ -105,7 +105,7 @@
             </TextField>
             <Label text="Opis" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <TextArea fx:id="textAreaDescription" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
@@ -115,12 +115,12 @@
             </TextArea>
             <Label text="Nazwa kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <Label text="Adres kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                <font>
-                  <Font name="System Bold" size="20.0" />
+                  <Font name="System Bold" size="16.0" />
                </font>
             </Label>
             <TextField fx:id="textFieldAddressContractor" GridPane.columnIndex="1" GridPane.rowIndex="7">

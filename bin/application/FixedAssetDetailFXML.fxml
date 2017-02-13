@@ -11,8 +11,8 @@
    <children>
       <GridPane prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="378.0" minWidth="10.0" prefWidth="378.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="380.0" minWidth="10.0" prefWidth="378.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="56.0" minHeight="10.0" prefHeight="48.0" vgrow="SOMETIMES" />
@@ -49,9 +49,9 @@
                   <Font name="System Bold" size="16.0" />
                </font>
             </Text>
-            <Text fx:id="textAmortNew" strokeType="OUTSIDE" strokeWidth="0.0" underline="true" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
+            <Text fx:id="textAmortNew" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" underline="true" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="6">
                <font>
-                  <Font name="System Bold" size="16.0" />
+                  <Font name="System Bold Italic" size="16.0" />
                </font>
             </Text>
             <TableView id="table-view-new-asset" fx:id="tableViewNew" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="7">
@@ -67,9 +67,9 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
-            <Text fx:id="textAmortUsed" strokeType="OUTSIDE" strokeWidth="0.0" underline="true" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="BOTTOM">
+            <Text fx:id="textAmortUsed" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" underline="true" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="BOTTOM">
                <font>
-                  <Font name="System Bold" size="16.0" />
+                  <Font name="System Bold Italic" size="16.0" />
                </font>
                <GridPane.margin>
                   <Insets bottom="10.0" />
@@ -112,7 +112,7 @@
                   <Font name="System Bold" size="16.0" />
                </font>
             </Text>
-            <Text fx:id="textNameContractor" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+            <Text fx:id="textNameContractor" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER" wrappingWidth="200.0" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
@@ -136,7 +136,7 @@
                   <Insets left="170.0" right="30.0" />
                </GridPane.margin>
             </Text>
-            <Text fx:id="textAddressContractor" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+            <Text fx:id="textAddressContractor" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" textAlignment="CENTER" wrappingWidth="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="16.0" />
                </font>
@@ -173,7 +173,7 @@
                   <Font size="16.0" />
                </font>
                <GridPane.margin>
-                  <Insets left="20.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label text="Adres" GridPane.columnIndex="1" GridPane.rowIndex="2">
@@ -181,7 +181,7 @@
                   <Font size="16.0" />
                </font>
                <GridPane.margin>
-                  <Insets left="20.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label text="Kwota brutto" GridPane.columnIndex="1" GridPane.rowIndex="3">
@@ -189,7 +189,7 @@
                   <Font size="16.0" />
                </font>
                <GridPane.margin>
-                  <Insets left="20.0" />
+                  <Insets />
                </GridPane.margin>
             </Label>
             <Label text="Opis" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">

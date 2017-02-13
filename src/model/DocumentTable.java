@@ -31,7 +31,7 @@ public class DocumentTable {
 		this.documentType = documentType;
 	}
 	
-	public DocumentTable(int id, String number, String grossAmount, String nameContractor, String date, String netAmount, String description, String addressContractor) {
+	public DocumentTable(int id, String number, String grossAmount, String nameContractor, String date, String description, String addressContractor) {
 		super();
 		this.id = id;
 		this.number = number;
@@ -43,17 +43,15 @@ public class DocumentTable {
 		this.addressContractor = addressContractor;
 	}
 	
-	public DocumentTable(int id, String number, String grossAmount, String nameContractor, String date, String netAmount, String description, String addressContractor, String vatAmount, String documentType) {
+	public DocumentTable(String number, int id, String grossAmount, String nameContractor, String date, String description, String addressContractor, String documentType) {
 		super();
 		this.id = id;
 		this.number = number;
 		this.grossAmount = grossAmount;
 		this.nameContractor = nameContractor;
 		this.date = date;
-		this.netAmount = netAmount;
 		this.description = description;
 		this.addressContractor = addressContractor;
-		this.setVatAmount(vatAmount);
 		this.documentType = documentType;
 	}
 

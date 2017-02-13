@@ -61,11 +61,6 @@ public class MainWindowController implements Initializable {
 			 		conn = openConnection(connStr);
 			 		if(logIn(conn, login, password)) {
 			 			id_uzytkownik = getIdUser(conn, login);
-			 			//stage = (Stage) gridPaneEditor.getScene().getWindow();
-			        	//root = FXMLLoader.load(getClass().getResource("MainMenuWindowFXML.fxml"));
-			        	//Scene scene = new Scene(root);
-			        	//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			            //stage.setScene(scene);
 			            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenuWindowFXML.fxml"));
 			            stage = (Stage) gridPaneEditor.getScene().getWindow();
 			            Scene scene = new Scene(loader.load());
@@ -189,7 +184,7 @@ public class MainWindowController implements Initializable {
 							
 							+ "create table if not exists rok (id_rok integer auto_increment primary key, "
 							+ "id_uzytkownik integer, "
-							+ "nazwa varchar(255) not null, "
+							+ "nazwa varchar(255), "
 							+ "data date not null, "
 							+ "CONSTRAINT FK_rok_uzytkownik FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik (id_uzytkownik)"
 							+ ")\\;"
@@ -206,6 +201,8 @@ public class MainWindowController implements Initializable {
 							+ "suma_koszt_bad_rozw decimal(10,2), "
 							+ "podatek decimal(10,2), "
 							+ "lp integer, "
+							+ "vat_nalezny decimal(10,2), "
+							+ "vat_naliczony decimal(10,2), "
 							+ "CONSTRAINT FK_miesiac_rok FOREIGN KEY (id_rok) REFERENCES rok (id_rok)"
 							+ ")\\;"
 							
@@ -219,6 +216,27 @@ public class MainWindowController implements Initializable {
 							+ "merge into kontrahent key(nazwa) values(4, 'T-MOBILE POLSKA SPӣKA AKCYJNA', 'Warszawa 02-674, ul. Marynarska 12')\\;"
 							+ "merge into kontrahent key(nazwa) values(5, 'PKP INTERCITY SPӣKA AKCYJNA', 'Warszawa 02-305, al. Aleje Jerozolimskie 142A')\\;"
 							
+							+ "create table if not exists stawka_podatku (id_stawka_podatku integer auto_increment primary key, "
+							+ "wartosc varchar(255) not null)\\;"
+							
+							+ "merge into stawka_podatku key(wartosc) values(1, '23')\\;"
+							+ "merge into stawka_podatku key(wartosc) values(2, '8')\\;"
+							+ "merge into stawka_podatku key(wartosc) values(3, '5')\\;"
+							+ "merge into stawka_podatku key(wartosc) values(4, '0')\\;"
+							+ "merge into stawka_podatku key(wartosc) values(5, 'zwolniona')\\;"
+							
+							+ "create table if not exists kwota_netto (id_kwota_netto integer auto_increment primary key, "
+							+ "id_stawka_podatku integer, "
+							+ "wartosc decimal(10,2) not null, "
+							+ "CONSTRAINT FK_kwotan_stawka FOREIGN KEY (id_stawka_podatku) REFERENCES stawka_podatku (id_stawka_podatku)"
+							+ ")\\;"
+							
+							+ "create table if not exists kwota_vat (id_kwota_vat integer auto_increment primary key, "
+							+ "id_stawka_podatku integer, "
+							+ "wartosc decimal(10,2) not null, "
+							+ "CONSTRAINT FK_kwotav_stawka FOREIGN KEY (id_stawka_podatku) REFERENCES stawka_podatku (id_stawka_podatku)"
+							+ ")\\;"
+							
 							+ "create table if not exists dokument_ksiegowy (id_dokument_ksiegowy integer auto_increment primary key, "
 							+ "id_uzytkownik integer, "
 							+ "id_typ_dokumentu integer, "
@@ -226,10 +244,8 @@ public class MainWindowController implements Initializable {
 							+ "id_kontrahent integer, "
 							+ "numer varchar(255) not null, "
 							+ "data date not null, "
-							+ "kwota_netto decimal(10,2), "
 							+ "kwota_brutto decimal(10,2) not null, "
 							+ "opis varchar(255) not null, "
-							+ "kwota_vat decimal(10,2), "
 							+ "lp integer not null, "
 							+ "CONSTRAINT FK_dokument_uzytkownik FOREIGN KEY (id_uzytkownik) REFERENCES uzytkownik (id_uzytkownik), "
 							+ "CONSTRAINT FK_dokument_typ_dokumentu FOREIGN KEY (id_typ_dokumentu) REFERENCES typ_dokumentu (id_typ_dokumentu), "
@@ -237,14 +253,21 @@ public class MainWindowController implements Initializable {
 							+ "CONSTRAINT FK_dokument_kontrahent FOREIGN KEY (id_kontrahent) REFERENCES kontrahent (id_kontrahent)"
 							+ ")\\;"
 							
-							+ "create table if not exists miesiac_vat (id_miesiac_vat integer auto_increment primary key, "
-							+ "id_miesiac integer, "
-							+ "data date, "
-							+ "suma_przychodow_brutto decimal(10,2), "
-							+ "suma_kosztow_brutto decimal(10,2), "
-							+ "podatek_vat_do_urzedu decimal(10,2), "
-							+ "CONSTRAINT FK_miesiac_vat_miesiac FOREIGN KEY (id_miesiac) REFERENCES miesiac (id_miesiac)"
+
+							+ "create table if not exists dokument_kwota_netto (id_dokument_ksiegowy integer not null, "
+							+ "id_kwota_netto integer not null, "
+							+ "CONSTRAINT FK_dkn_dokument FOREIGN KEY (id_dokument_ksiegowy) REFERENCES dokument_ksiegowy (id_dokument_ksiegowy), "
+							+ "CONSTRAINT FK_dkn_kwota_netto FOREIGN KEY (id_kwota_netto) REFERENCES kwota_netto (id_kwota_netto), "
+							+ "PRIMARY KEY (id_dokument_ksiegowy, id_kwota_netto)"
+							+ ")\\;"
+							
+							+ "create table if not exists dokument_kwota_vat (id_dokument_ksiegowy integer not null, "
+							+ "id_kwota_vat integer not null, "
+							+ "CONSTRAINT FK_dkv_dokument FOREIGN KEY (id_dokument_ksiegowy) REFERENCES dokument_ksiegowy (id_dokument_ksiegowy), "
+							+ "CONSTRAINT FK_dkv_kwota_vat FOREIGN KEY (id_kwota_vat) REFERENCES kwota_vat (id_kwota_vat), "
+							+ "PRIMARY KEY (id_dokument_ksiegowy, id_kwota_vat)"
 							+ ");";
+							
 		conn = openConnection(connStr);
 		closeConnection(conn);	
 		}

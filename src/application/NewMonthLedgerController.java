@@ -72,18 +72,22 @@ public class NewMonthLedgerController implements Initializable {
 				conn = openConnection(connStr);
 				String month = choiceBoxMonths.getValue().toString();
 				int month_number = monthsMap.get(month);
-				if(addNewMonth(conn, month_number)) {
-					FXMLLoader loader = new FXMLLoader(getClass().getResource("NewMonthLedgerFXML.fxml"));
-		            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-		            Scene scene = new Scene(loader.load());
-					scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		            stage.setScene(scene);
-		            NewMonthLedgerController newMonthLedgerController = loader.<NewMonthLedgerController>getController();
-		            newMonthLedgerController.initData(id_uzytkownik, year);
-		            stage.setResizable(false);
-		            stage.show();
+				if(!ifMonthExists(conn, month_number)) {
+					if(addNewMonth(conn, month_number)) {
+						FXMLLoader loader = new FXMLLoader(getClass().getResource("NewMonthLedgerFXML.fxml"));
+			            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+			            Scene scene = new Scene(loader.load());
+						scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			            stage.setScene(scene);
+			            NewMonthLedgerController newMonthLedgerController = loader.<NewMonthLedgerController>getController();
+			            newMonthLedgerController.initData(id_uzytkownik, year);
+			            stage.setResizable(false);
+			            stage.show();
+					} else {
+						textError.setText("Wyst¹pi³ b³¹d, nie dodano miesi¹ca");
+					}
 				} else {
-					textError.setText("Wyst¹pi³ b³¹d, nie dodano miesi¹ca");
+					textError.setText("Ksiêga z podanym miesi¹cem ju¿ istnieje!");
 				}
 				closeConnection(conn);
 			} else {
@@ -139,7 +143,7 @@ public class NewMonthLedgerController implements Initializable {
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
 			while(rs.next()) {
-				if(rs.getString(1)=="tak") {
+				if(rs.getString(1).equals("tak")) {
 					vat = true;
 				} else {
 					vat = false;
@@ -149,6 +153,28 @@ public class NewMonthLedgerController implements Initializable {
 			System.out.println("B³¹d sprawdzenia czy u¿ytkownik prowadzi rejestr vat: " + ex);
 		}
 		return vat;
+	}
+	
+	private Boolean ifMonthExists(Connection conn, int month) {
+		Boolean exist = false;
+		try {
+			String query = String.format("select count(*) from miesiac, rok, uzytkownik "
+					+ "where uzytkownik.id_uzytkownik = rok.id_uzytkownik "
+					+ "and miesiac.id_rok = rok.id_rok "
+					+ "and month(miesiac.data) = '%d' "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and year(miesiac.data) = '%s'", month, id_uzytkownik, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				if(rs.getInt(1)==1) {
+					exist = true;
+				}
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d sprawdzenia czy miesi¹c istnieje: " + ex);
+		}
+		return exist;
 	}
 	
 	private Boolean addNewMonth(Connection conn, int month) {
@@ -220,7 +246,11 @@ public class NewMonthLedgerController implements Initializable {
 	private ArrayList<String> getMonths(Connection conn) {
 		ArrayList<String> months = new ArrayList<>();
 		try {
-			String query = String.format("select monthname(miesiac.data) from miesiac, rok where miesiac.id_rok = rok.id_rok and year(rok.data) = '%s'", year);
+			String query = String.format("select monthname(miesiac.data) from miesiac, rok, uzytkownik "
+					+ "where miesiac.id_rok = rok.id_rok "
+					+ "and uzytkownik.id_uzytkownik = rok.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and year(rok.data) = '%s'", id_uzytkownik, year);
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
 			String month_name;

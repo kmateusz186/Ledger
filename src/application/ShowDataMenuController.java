@@ -42,6 +42,16 @@ public class ShowDataMenuController {
 			stage.setScene(scene);
 			stage.setResizable(false);
 			stage.show();
+		} else if(event.getSource()==btnShowLedgers) {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("LedgersVatFXML.fxml"));
+            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
+            LedgersVatController ledgersVatController = loader.<LedgersVatController>getController();
+            ledgersVatController.initData(id_uzytkownik);
+            stage.setResizable(false);
+            stage.show();
 		} else if(event.getSource()==btnShowAddedDocuments) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("DocumentsFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();
@@ -53,7 +63,15 @@ public class ShowDataMenuController {
             stage.setResizable(false);
             stage.show();
 		} else if (event.getSource()==btnGeneratedTaxes) {
-			
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("GeneratedTaxesFXML.fxml"));
+            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+            Scene scene = new Scene(loader.load());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+            stage.setScene(scene);
+            GeneratedTaxesController generatedTaxesController = loader.<GeneratedTaxesController>getController();
+            generatedTaxesController.initData(id_uzytkownik);
+            stage.setResizable(false);
+            stage.show();
 		} else if (event.getSource()==btnEquipment) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("EquipmentFXML.fxml"));
             stage = (Stage) anchorPaneEditor.getScene().getWindow();

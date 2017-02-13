@@ -38,12 +38,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.DocumentTable;
 import model.Month;
+import model.User;
 
 public class NewDocumentsController {
 	
@@ -515,16 +517,24 @@ public class NewDocumentsController {
 						
 						mapTax.put("resultSumRounded", String.format("%d", finalResultSum.intValue()));
 						yearTaxSum = getMonthTaxes(conn);
+						
+						String taxScaleRate = "";
+						
 						if(finalResultSum > 0) {
 							if(taxWay.equals("zasady ogólne")) {
 								if(finalResultSum < 85528) {
 									tax = finalResultSum * 0.18;
+									taxScaleRate = "18%";
 								} else {
 									tax = finalResultSum * 0.32;
+									taxScaleRate = "32%";
 								}	
 							} else if(taxWay.equals("podatek liniowy")) {
 								tax = finalResultSum * 0.19;
+								taxScaleRate = "19%";
 							}				
+							
+							mapTax.put("taxScaleRate", "Podatek nale¿ny wed³ug skali " + taxScaleRate);
 							mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
 							mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
 							mapTax.put("healthIns", String.format("%.2f", 255.99 * monthNumber).replace('.', ','));
@@ -547,17 +557,21 @@ public class NewDocumentsController {
 					}
 				}
 				
-				ExcelCreation createLedger = new ExcelCreation(System.getenv("userprofile") + "/Desktop/PD/template3.xlsx", 0, System.getenv("userprofile") + "/Desktop/PD/out.xlsx", month + " " + year, map, month + " " + year);
-			    createLedger.doExcel();
-			    
-			    BigDecimal bgFinalTax = new BigDecimal(String.valueOf(finalTax.intValue()));
-			    
-			    if(updateMonthWithTax(conn, bgFinalTax)) {
-			    	ExcelCreation createTax = new ExcelCreation(System.getenv("userprofile") + "/Desktop/PD/template_podatek.xlsx", 0, System.getenv("userprofile") + "/Desktop/PD/outPodatek.xlsx", month + " " + year, mapTax, month + " " + year);
-				    createTax.doExcel();
-			    	value = true;
-			    } else {
-			    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem");
+				if(updateLedgerWithName(conn, "KPIR_" + year + "_" + getUserNip(conn) + ".xlsx")) {
+					ExcelCreation createLedger = new ExcelCreation(System.getProperty("user.dir") + "/Templates/template_kpir.xlsx", 0, System.getProperty("user.dir") + "/CreatedFiles/KPIR_" + year + "_" + getUserNip(conn) + ".xlsx", month + " " + year, map, month + " " + year);
+				    createLedger.doExcel();
+				    
+				    BigDecimal bgFinalTax = new BigDecimal(String.valueOf(finalTax.intValue()));
+				    
+				    if(updateMonthWithTax(conn, bgFinalTax)) {
+				    	ExcelCreation createTax = new ExcelCreation(System.getProperty("user.dir") + "/Templates/template_podatek.xlsx", 0, System.getProperty("user.dir") + "/CreatedFiles/ZALICZKA_" + year + "_" + getUserNip(conn) + ".xlsx", month + " " + year, mapTax, month + " " + year);
+					    createTax.doExcel();
+				    	value = true;
+				    } else {
+				    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem");
+				    } 
+				} else {
+			    	System.out.println("Nie zaktualizowano tabeli rok z nazw¹");
 			    }
 			} else {
 				System.out.println("Nie zaktualizowano tabeli miesiac");
@@ -570,8 +584,26 @@ public class NewDocumentsController {
 		int monthNumber = monthsMap.get(month);
 			try {
 				String query = String.format("update miesiac set podatek = '%s' "
-						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
-						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", tax, monthNumber, year); 
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", tax, id_uzytkownik, monthNumber, year); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba dodanych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+		
+		return result;
+	}
+	
+	private Boolean updateLedgerWithName(Connection conn, String name) {
+		Boolean result = false;
+			try {
+				String query = String.format("update rok set nazwa = '%s' "
+						+ "where id_rok = (select rok.id_rok from rok, uzytkownik where uzytkownik.id_uzytkownik = rok.id_uzytkownik "
+						+ "and uzytkownik.id_uzytkownik = '%d' and year(rok.data) = '%s')", name, id_uzytkownik, year); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -676,8 +708,8 @@ public class NewDocumentsController {
 			try {
 				String query = String.format("update miesiac set suma_wartosc_sprz_towar = '%s', suma_poz_przych = '%s', suma_zak_towar = '%s', "
 						+ "suma_koszt_ub = '%s', suma_wynagrodzen = '%s', suma_wydatkow = '%s', suma_koszt_bad_rozw = '%s', lp = %d "
-						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
-						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn), monthNumber, year); 
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn), id_uzytkownik, monthNumber, year); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -904,12 +936,16 @@ public class NewDocumentsController {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if(newValue.equals("zakup œrodków trwa³ych")) {
-					textFieldGrossAmount.setPromptText("Kwota musi przekroczyæ 3500 z³");
+					Tooltip tooltipAmount = new Tooltip();
+					tooltipAmount.setText("Kwota musi przekroczyæ 3500 z³");
+					textFieldGrossAmount.setTooltip(tooltipAmount);
 					textError.setText("Amortyzacja w szczegó³ach dokumentu");
-					textAreaDescription.setText("");
+					textAreaDescription.setText("Przyk³adowo samochód - typ, marka, pojemnoœæ silnika, numer rejestracyjny, \nnumer podwozia/nadwozia, rok produkcji");
 				} else if(newValue.equals("zakup wyposa¿enia")) {
-					textFieldGrossAmount.setPromptText("Kwota musi przekroczyæ 1500 z³");
-					textError.setText("U¿ytkowanie nied³u¿sze ni¿ rok");
+					Tooltip tooltipAmount = new Tooltip();
+					tooltipAmount.setText("Kwota musi przekroczyæ 1500 z³");
+					textFieldGrossAmount.setTooltip(tooltipAmount);
+					textError.setText("U¿ytkowanie poni¿ej roku");
 				}
 			}
 		});
@@ -928,6 +964,21 @@ public class NewDocumentsController {
 			System.out.println("B³¹d pobierania danych o kontrahentach: " + ex);
 		}
 		return list;
+	}
+	
+	private String getUserNip(Connection conn) {
+		String nip = "";
+		try {
+			String query = String.format("select nip from uzytkownik where id_uzytkownik = '%d'", id_uzytkownik);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				nip = rs.getString(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o u¿ytkowniku: " + ex);
+		}
+		return nip;
 	}
 	
 	private void setAmountFields() {

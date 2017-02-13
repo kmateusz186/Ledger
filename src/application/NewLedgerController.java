@@ -44,8 +44,6 @@ public class NewLedgerController implements Initializable {
 	@FXML
 	private AnchorPane anchorPaneEditor;
 	@FXML
-	private TextField textFieldNameLedger;
-	@FXML
 	private TextField textFieldYear;
 	@FXML
 	private Text textError;
@@ -65,13 +63,12 @@ public class NewLedgerController implements Initializable {
 			stage.setResizable(false);
 			stage.show();
 		} else if(event.getSource()==btnNewLedger) {
-			if(!textFieldNameLedger.getText().isEmpty() && !textFieldYear.getText().isEmpty()) {
+			if(!textFieldYear.getText().isEmpty()) {
 				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 				conn = openConnection(connStr);
 				String year = textFieldYear.getText().toString();
-				String name = textFieldNameLedger.getText().toString();
 				if(!ifLedgerExists(conn, year)) {
-					if(addLedger(conn, name, year)) {
+					if(addLedger(conn, year)) {
 						FXMLLoader loader = new FXMLLoader(getClass().getResource("NewLedgerFXML.fxml"));
 			            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 			            Scene scene = new Scene(loader.load());
@@ -123,7 +120,10 @@ public class NewLedgerController implements Initializable {
 	private Boolean ifLedgerExists(Connection conn, String year) {
 		Boolean exist = false;
 		try {
-			String query = String.format("select count(*) from rok where year(data) = '%s'", year);
+			String query = String.format("select count(*) from rok, uzytkownik "
+					+ "where uzytkownik.id_uzytkownik = rok.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and year(data) = '%s'", id_uzytkownik, year);
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
 			while(rs.next()) {
@@ -137,7 +137,7 @@ public class NewLedgerController implements Initializable {
 		return exist;
 	}
 	
-	private Boolean addLedger(Connection conn, String name, String year) {
+	private Boolean addLedger(Connection conn, String year) {
 		Boolean result;
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date d = new Date();
@@ -147,7 +147,7 @@ public class NewLedgerController implements Initializable {
 			e.printStackTrace();
 		}
 		try {
-			String query = String.format("insert into rok(id_uzytkownik,nazwa,data) values('%d','%s','%s')", this.id_uzytkownik, name, dateFormat.format(d)); 
+			String query = String.format("insert into rok(id_uzytkownik,data) values('%d','%s')", this.id_uzytkownik, dateFormat.format(d)); 
 			Statement stm = conn.createStatement();
 			int count = stm.executeUpdate(query);
 			System.out.println("Liczba dodanych rekordów " + count);

@@ -142,7 +142,7 @@
                   <Insets right="20.0" />
                </GridPane.margin>
             </Button>
-            <Button fx:id="btnBackToLogIn" mnemonicParsing="false" onAction="#handleButtonAction" text="Wycofaj do logowania" GridPane.rowIndex="13">
+            <Button fx:id="btnBackToLogIn" mnemonicParsing="false" onAction="#handleButtonAction" text="Wróć do logowania" GridPane.rowIndex="13">
                <font>
                   <Font size="15.0" />
                </font>

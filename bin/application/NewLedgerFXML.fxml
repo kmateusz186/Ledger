@@ -17,7 +17,6 @@
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -29,22 +28,12 @@
                   <Font size="23.0" />
                </font>
             </Text>
-            <Label text="Nazwa" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+            <Label text="Rok" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
                <font>
                   <Font name="System Bold" size="20.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldNameLedger" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="Rok" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-            </Label>
-            <TextField fx:id="textFieldYear" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextField fx:id="textFieldYear" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="20.0" right="150.0" />
                </GridPane.margin>
@@ -57,7 +46,7 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#handleButtonAction" text="Wróć do menu" GridPane.rowIndex="6">
+            <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#handleButtonAction" text="Wróć do menu" GridPane.rowIndex="5">
                <GridPane.margin>
                   <Insets left="20.0" />
                </GridPane.margin>
@@ -65,7 +54,7 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Button fx:id="btnNewLedger" mnemonicParsing="false" onAction="#handleButtonAction" text="Stwórz księge" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+            <Button fx:id="btnNewLedger" mnemonicParsing="false" onAction="#handleButtonAction" text="Stwórz księge" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets right="20.0" />
                </GridPane.margin>
@@ -73,12 +62,12 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+            <Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold Italic" size="18.0" />
                </font>
             </Text>
-            <Button fx:id="btnMonths" mnemonicParsing="false" onAction="#handleButtonAction" text="Przejdź do panelu miesięcy" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+            <Button fx:id="btnMonths" mnemonicParsing="false" onAction="#handleButtonAction" text="Przejdź do panelu miesięcy" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
                <GridPane.margin>
                   <Insets right="20.0" />
                </GridPane.margin>
@@ -86,12 +75,12 @@
                   <Font size="15.0" />
                </font>
             </Button>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Księgi istniejące w bazie" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Księgi istniejące w bazie" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                <font>
                   <Font size="23.0" />
                </font>
             </Text>
-            <ListView fx:id="listViewLedgers" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
+            <ListView fx:id="listViewLedgers" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="20.0" right="20.0" />
                </GridPane.margin>

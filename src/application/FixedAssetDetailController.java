@@ -171,19 +171,66 @@ public class FixedAssetDetailController {
 	
 	private DocumentTable getFixedAsset(Connection conn) {
 		DocumentTable document = null;
+		Double netAmount = 0.0;
+		Double vatAmount = 0.0;
 		try {
-			String query = String.format("select dokument_ksiegowy.id_dokument_ksiegowy, dokument_ksiegowy.numer, dokument_ksiegowy.kwota_brutto, kontrahent.nazwa, dokument_ksiegowy.data, dokument_ksiegowy.kwota_netto, dokument_ksiegowy.opis, kontrahent.adres "
+			String query = String.format("select dokument_ksiegowy.id_dokument_ksiegowy, dokument_ksiegowy.numer, dokument_ksiegowy.kwota_brutto, kontrahent.nazwa, dokument_ksiegowy.data, dokument_ksiegowy.opis, kontrahent.adres "
 			+ "from dokument_ksiegowy, kontrahent "
 			+ "where dokument_ksiegowy.id_kontrahent = kontrahent.id_kontrahent "
 			+ "and dokument_ksiegowy.id_dokument_ksiegowy = '%d'", id_asset);
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
 			while(rs.next()) {
-				document = new DocumentTable(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8));
+				document = new DocumentTable(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
 			}
 		} catch(SQLException ex) {
 			System.out.println("B³¹d pobierania danych o œrodku trwa³ym: " + ex);
 		}
+		
+		try {
+			String query = String.format("select kwota_netto.wartosc "
+					+ "from dokument_ksiegowy, kwota_netto, dokument_kwota_netto " 
+			+ "where dokument_kwota_netto.id_kwota_netto = kwota_netto.id_kwota_netto "
+			+ "and dokument_kwota_netto.id_dokument_ksiegowy = dokument_ksiegowy.id_dokument_ksiegowy "
+			+ "and dokument_ksiegowy.id_dokument_ksiegowy = '%d' ", document.getId());
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				netAmount += rs.getDouble(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o kwocie netto: " + ex);
+		}
+		if(netAmount == 0.0) {
+			document.setNetAmount(null);
+		} else {
+			document.setNetAmount(String.valueOf(netAmount));
+		}
+		
+		try {
+			String query = String.format("select kwota_vat.wartosc "
+					+ "from dokument_ksiegowy, kwota_vat, dokument_kwota_vat " 
+			+ "where dokument_kwota_vat.id_kwota_vat = kwota_vat.id_kwota_vat "
+			+ "and dokument_kwota_vat.id_dokument_ksiegowy = dokument_ksiegowy.id_dokument_ksiegowy "
+			+ "and dokument_ksiegowy.id_dokument_ksiegowy = '%d' ", document.getId());
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				vatAmount += rs.getDouble(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o kwocie vat: " + ex);
+		}
+		if(vatAmount == 0.0) {
+			document.setVatAmount(null);
+		} else {
+			document.setVatAmount(String.valueOf(vatAmount));
+		}
+		
+		if(document.getGrossAmount() == null) {
+			document.setGrossAmount(String.valueOf(netAmount + vatAmount));
+		}
+		
 		return document;
 	}
 	
