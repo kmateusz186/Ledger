@@ -163,7 +163,7 @@ public class NewDocumentsVatController {
 					documentType = choiceBoxDocumentTypes.getValue().toString();
 					ld = datePickerDateDocument.getValue();
 					c =  Calendar.getInstance();
-					c.set(ld.getYear(), ld.getMonthValue(), ld.getDayOfMonth());
+					c.set(ld.getYear(), ld.getMonthValue()-1, ld.getDayOfMonth());
 					date = c.getTime();
 					netAmount1 = textFieldNet1.getText().toString();
 					vatAmount1 = textFieldVat1.getText().toString();
@@ -179,20 +179,20 @@ public class NewDocumentsVatController {
 					vatSum = Double.valueOf(vatAmount1.replace(',', '.')) + Double.valueOf(vatAmount2.replace(',', '.')) + Double.valueOf(vatAmount3.replace(',', '.')) + Double.valueOf(vatAmount4.replace(',', '.')) + Double.valueOf(vatAmount5.replace(',', '.'));
 					grossAmount = String.valueOf(netSum + vatSum).replace('.', ',');
 					description = textAreaDescription.getText().toString();
-					nameContractor = comboBoxNameContractor.getSelectionModel().getSelectedItem();
+					nameContractor = comboBoxNameContractor.getValue().toString();
 					addressContractor = textFieldAddressContractor.getText().toString();
 					
 					Double amount = Double.valueOf(grossAmount.replace(',', '.'));
 					if(documentType.equals("zakup œrodków trwa³ych")) {
 						if(amount > 3500) {
 							if(addNewDocument(conn, numberDocument, documentType, date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor)) {
-								FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+								FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
 					            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 					            Scene scene = new Scene(loader.load());
 								scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 					            stage.setScene(scene);
-					            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-					            newDocumentsController.initData(id_uzytkownik, year, month);
+					            NewDocumentsVatController newDocumentsVatController = loader.<NewDocumentsVatController>getController();
+					            newDocumentsVatController.initData(id_uzytkownik, year, month);
 					            stage.setResizable(false);
 					            stage.show();
 							} else {
@@ -204,13 +204,13 @@ public class NewDocumentsVatController {
 					} else if(documentType.equals("zakup wyposa¿enia")) {
 								if(amount > 1500) {
 									if(addNewDocument(conn, numberDocument, documentType, date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor) && addNewDocument(conn, numberDocument, "zakupy/wydatki", date, netAmount1, vatAmount1, netAmount2, vatAmount2, netAmount3, vatAmount3, netAmount4, vatAmount4, netAmount5, vatAmount5, grossAmount, description, nameContractor, addressContractor)) {
-										FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+										FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
 							            stage = (Stage) anchorPaneEditor.getScene().getWindow();
 							            Scene scene = new Scene(loader.load());
 										scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 							            stage.setScene(scene);
-							            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-							            newDocumentsController.initData(id_uzytkownik, year, month);
+							            NewDocumentsVatController newDocumentsVatController = loader.<NewDocumentsVatController>getController();
+							            newDocumentsVatController.initData(id_uzytkownik, year, month);
 							            stage.setResizable(false);
 							            stage.show();
 									} else {
@@ -323,7 +323,7 @@ public class NewDocumentsVatController {
 		Double yearTaxSum = 0.00;
 			try {
 				String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
-						+ "dokument_ksiegowy.data, kontrahent.nazwa, kontrahent.adres, "
+						+ "dokument_ksiegowy.data, upper(kontrahent.nazwa), kontrahent.adres, "
 						+ "dokument_ksiegowy.opis, dokument_ksiegowy.id_dokument_ksiegowy "
 				+ "from dokument_ksiegowy, miesiac, uzytkownik, rok, typ_dokumentu, kontrahent " 
 				+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
@@ -588,32 +588,41 @@ public class NewDocumentsVatController {
 						
 						mapTax.put("resultSumRounded", String.format("%d", finalResultSum.intValue()));
 						yearTaxSum = getMonthTaxes(conn);
-						if(finalResultSum > 0) {
-							if(taxWay.equals("zasady ogólne")) {
-								if(finalResultSum < 85528) {
-									tax = finalResultSum * 0.18;
-								} else {
-									tax = finalResultSum * 0.32;
-								}	
-							} else if(taxWay.equals("podatek liniowy")) {
-								tax = finalResultSum * 0.19;
-							}				
-							mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
-							mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
-							mapTax.put("healthIns", String.format("%.2f", 255.99 * monthNumber).replace('.', ','));
-							mapTax.put("taxValueMinusHI", String.format("%.2f", tax.intValue() - 255.99 * monthNumber).replace('.', ','));
-							mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
-							finalTax = tax.intValue() - 255.99 * monthNumber - yearTaxSum;
-							mapTax.put("finalTax", String.format("%.2f", finalTax).replace('.', ','));
-							mapTax.put("finalTaxRounded", String.format("%d", finalTax.intValue()));
-						} else {
-							mapTax.put("taxValue", "0,00");
-							mapTax.put("taxValueRounded", "0,00");
-							mapTax.put("healthIns", String.format("%.2f", 255.99 * monthNumber).replace('.', ','));
-							mapTax.put("taxValueMinusHI", "0,00");
-							mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
-							mapTax.put("finalTax", "0,00");
-							mapTax.put("finalTaxRounded", "0,00");
+						String taxScaleRate = "";
+						int earliestMonth = getEarliestMonth(conn);
+						if(earliestMonth != 0) {
+							if(finalResultSum > 0) {
+								if(taxWay.equals("zasady ogólne")) {
+									if(finalResultSum < 85528) {
+										tax = finalResultSum * 0.18;
+										taxScaleRate = "18%";
+									} else {
+										tax = finalResultSum * 0.32;
+										taxScaleRate = "32%";
+									}	
+								} else if(taxWay.equals("podatek liniowy")) {
+									tax = finalResultSum * 0.19;
+									taxScaleRate = "19%";
+								}				
+								
+								mapTax.put("taxScaleRate", "Podatek nale¿ny wed³ug skali " + taxScaleRate);
+								mapTax.put("taxValue", String.format("%.2f", tax).replace('.', ','));
+								mapTax.put("taxValueRounded", String.format("%d", tax.intValue()));
+								mapTax.put("healthIns", String.format("%.2f", 255.99 * (monthNumber - earliestMonth + 1)).replace('.', ','));
+								mapTax.put("taxValueMinusHI", String.format("%.2f", tax.intValue() - 255.99 * (monthNumber - earliestMonth + 1)).replace('.', ','));
+								mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
+								finalTax = tax.intValue() - 255.99 * (monthNumber - earliestMonth + 1) - yearTaxSum;
+								mapTax.put("finalTax", String.format("%.2f", finalTax).replace('.', ','));
+								mapTax.put("finalTaxRounded", String.format("%d", finalTax.intValue()));
+							} else {
+								mapTax.put("taxValue", "0,00");
+								mapTax.put("taxValueRounded", "0,00");
+								mapTax.put("healthIns", String.format("%.2f", 255.99 * (monthNumber - earliestMonth + 1)).replace('.', ','));
+								mapTax.put("taxValueMinusHI", "0,00");
+								mapTax.put("yearTax", String.format("%d", yearTaxSum.intValue()));
+								mapTax.put("finalTax", "0,00");
+								mapTax.put("finalTaxRounded", "0,00");
+							}
 						}
 					} else {
 						System.out.println("Nie pobrano danych z poprzednich miesiecy");
@@ -670,7 +679,7 @@ public class NewDocumentsVatController {
 
 		try {
 			String query = String.format("select typ_dokumentu.nazwa, dokument_ksiegowy.lp, dokument_ksiegowy.numer, "
-					+ "dokument_ksiegowy.data, kontrahent.nazwa, kontrahent.adres, "
+					+ "dokument_ksiegowy.data, upper(kontrahent.nazwa), kontrahent.adres, "
 					+ "dokument_ksiegowy.opis, dokument_ksiegowy.id_dokument_ksiegowy "
 			+ "from dokument_ksiegowy, miesiac, uzytkownik, rok, typ_dokumentu, kontrahent " 
 			+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
@@ -826,6 +835,26 @@ public class NewDocumentsVatController {
 	    	System.out.println("Nie zaktualizowano tabeli miesiac z podatkiem VAT");
 	    }
 		return value;
+	}
+	
+	private int getEarliestMonth(Connection conn) {
+		int number = 0;
+		try {
+			String query = String.format("select min(month(miesiac.data)) "
+						+ "from miesiac, rok, uzytkownik " 
+					+ "where miesiac.id_rok = rok.id_rok "
+					+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik "
+					+ "and uzytkownik.id_uzytkownik = '%d' "
+					+ "and year(rok.data) = '%s'", id_uzytkownik, year);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				number = rs.getInt(1);
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania numeru najwczeœniejszego miesi¹ca: " + ex);
+		}
+		return number;
 	}
 	
 	private Boolean updateMonthWithTax(Connection conn, BigDecimal tax) {
@@ -1540,6 +1569,10 @@ public class NewDocumentsVatController {
 			String query = String.format("insert into kontrahent(nazwa,adres) values('%s','%s')", name, address); 
 			Statement stm = conn.createStatement();
 			id = stm.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stm.getGeneratedKeys();
+			if (rs.next()){
+			    id=rs.getInt(1);
+			}
 			System.out.println("ID dodanego rekordu " + id);
 		} catch (SQLException e) {
 			System.out.println("B³¹d przy przetwarzaniu danych: " + e);
@@ -1608,7 +1641,7 @@ public class NewDocumentsVatController {
 	private HashMap<String, String> getContractors(Connection conn) {
 		HashMap<String, String> list = new LinkedHashMap<>();
 		try {
-			String query = "select nazwa, adres from kontrahent";
+			String query = "select upper(nazwa), adres from kontrahent order by nazwa";
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
 			while(rs.next()) {
@@ -1865,7 +1898,7 @@ public class NewDocumentsVatController {
 	private ArrayList<DocumentTable> getDocuments(Connection conn, int month) {
 		ArrayList<DocumentTable> documents = new ArrayList<>();
 		try {
-			String query = String.format("select dokument_ksiegowy.id_dokument_ksiegowy, dokument_ksiegowy.numer, dokument_ksiegowy.data, dokument_ksiegowy.kwota_brutto, kontrahent.nazwa, typ_dokumentu.nazwa "
+			String query = String.format("select dokument_ksiegowy.id_dokument_ksiegowy, dokument_ksiegowy.numer, dokument_ksiegowy.data, dokument_ksiegowy.kwota_brutto, upper(kontrahent.nazwa), typ_dokumentu.nazwa "
 			+ "from dokument_ksiegowy, typ_dokumentu, miesiac, uzytkownik, rok, kontrahent " 
 			+ "where dokument_ksiegowy.id_uzytkownik = uzytkownik.id_uzytkownik "
 			+ "and dokument_ksiegowy.id_typ_dokumentu = typ_dokumentu.id_typ_dokumentu "

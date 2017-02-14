@@ -165,8 +165,8 @@ public class FixedAssetDetailController {
 		String year = documentTable.getDate().substring(0,4);
 		int month = Integer.valueOf(documentTable.getDate().substring(5,7));
 		String monthName = monthsMap.get(month+1);
-		textAmortNew.setText("Amortyzacja - nowy œrodek trwa³y" + " od " + monthName + " " + year + " przez 60 miesiêcy jako zakupy/wydatki");
-		textAmortUsed.setText("Amortyzacja - u¿ywany œrodek trwa³y" + " od " + monthName + " " + year + " przez 30 miesiêcy jako zakupy/wydatki");
+		textAmortNew.setText("Amortyzacja - nowy œrodek trwa³y" + " od " + monthName + " " + year + " przez 60 miesiêcy jako wydatki/DW");
+		textAmortUsed.setText("Amortyzacja - u¿ywany œrodek trwa³y" + " od " + monthName + " " + year + " przez 30 miesiêcy jako wydatki/DW");
 	}
 	
 	private DocumentTable getFixedAsset(Connection conn) {
