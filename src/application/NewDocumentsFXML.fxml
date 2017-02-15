@@ -151,11 +151,12 @@
                   <Insets left="20.0" right="20.0" />
                </GridPane.margin>
                <columns>
-                  <TableColumn fx:id="tcDate" prefWidth="143.0" text="Data transakcji" />
-                  <TableColumn fx:id="tcNumber" prefWidth="143.0" text="Numer dokumentu" />
-                  <TableColumn fx:id="tcName" prefWidth="143.0" text="Nazwa kontrahenta" />
-                  <TableColumn fx:id="tcMoney" prefWidth="143.0" text="Kwota brutto [zł]" />
-                  <TableColumn fx:id="tcDocumentType" prefWidth="142.0" text="Typ dokumentu" />
+                  <TableColumn fx:id="tcDate" prefWidth="125.0" text="Data transakcji" />
+                  <TableColumn fx:id="tcNumber" prefWidth="137.0" text="Numer dokumentu" />
+                  <TableColumn fx:id="tcName" prefWidth="155.0" text="Nazwa kontrahenta" />
+                  <TableColumn fx:id="tcMoney" prefWidth="107.0" text="Kwota brutto [zł]" />
+                  <TableColumn fx:id="tcDocumentType" prefWidth="106.0" text="Typ dokumentu" />
+                  <TableColumn fx:id="tcAction" prefWidth="71.0" text="Akcja" />
                </columns>
             </TableView>
             <ComboBox fx:id="comboBoxNameContractor" editable="true" onAction="#handleButtonAction" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="6">

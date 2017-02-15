@@ -33,6 +33,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -43,6 +44,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.DocumentTable;
 import model.Month;
 import model.User;
@@ -93,6 +95,8 @@ public class NewDocumentsController {
 	private TableColumn tcDate;
 	@FXML
 	private TableColumn tcDocumentType;
+	@FXML
+	private TableColumn tcAction;
 	@FXML 
 	private Text textError;
 	@FXML
@@ -944,6 +948,43 @@ public class NewDocumentsController {
 		tcName.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("nameContractor"));
 		tcDate.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("date"));
 		tcDocumentType.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("documentType"));
+		tcAction.setCellValueFactory(new PropertyValueFactory<>( "value" ));
+		Callback<TableColumn<DocumentTable, String>, TableCell<DocumentTable, String>> cellFactory = 
+                new Callback<TableColumn<DocumentTable, String>, TableCell<DocumentTable, String>>()
+                {
+                    @Override
+                    public TableCell call( final TableColumn<DocumentTable, String> param )
+                    {
+                        final TableCell<DocumentTable, String> cell = new TableCell<DocumentTable, String>()
+                        {
+
+                            final Button btn = new Button( "Usuñ" );
+
+                            @Override
+                            public void updateItem( String item, boolean empty )
+                            {
+                                super.updateItem( item, empty );
+                                if ( empty )
+                                {
+                                    setGraphic( null );
+                                    setText( null );
+                                }
+                                else
+                                {
+                                    btn.setOnAction( ( ActionEvent event ) ->
+                                            {
+                                            	DocumentTable documentTable = getTableView().getItems().get( getIndex() );
+                                                System.out.println( documentTable.getNameContractor() );
+                                    } );
+                                    setGraphic( btn );
+                                    setText( null );
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        tcAction.setCellFactory(cellFactory);
 		Connection conn;
 		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 		conn = openConnection(connStr);

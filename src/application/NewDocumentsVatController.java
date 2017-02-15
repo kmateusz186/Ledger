@@ -39,6 +39,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -49,6 +50,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.DocumentTable;
 import model.Month;
 
@@ -116,6 +118,8 @@ public class NewDocumentsVatController {
 	private TableColumn tcDate;
 	@FXML
 	private TableColumn tcDocumentType;
+	@FXML
+	private TableColumn tcAction;
 	@FXML 
 	private Text textError;
 	@FXML
@@ -876,6 +880,97 @@ public class NewDocumentsVatController {
 		return result;
 	}
 	
+	private Boolean deleteDocument(Connection conn, int id_document) {
+		Boolean result = false;
+		ArrayList<Integer> netIds = new ArrayList<>();
+		ArrayList<Integer> vatIds = new ArrayList<>();
+		try {
+			String query = String.format("select dokument_kwota_netto.id_kwota_netto "
+			+ "from dokument_kwota_netto "
+			+ "where dokument_kwota_netto.id_dokument_ksiegowy = '%d'", id_document);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				netIds.add(rs.getInt(1));
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o id kwot netto dokumentu: " + ex);
+		}
+		
+		try {
+			String query = String.format("select dokument_kwota_vat.id_kwota_vat "
+			+ "from dokument_kwota_vat "
+			+ "where dokument_kwota_vat.id_dokument_ksiegowy = '%d'", id_document);
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery(query);
+			while(rs.next()) {
+				vatIds.add(rs.getInt(1));
+			}
+		} catch(SQLException ex) {
+			System.out.println("B³¹d pobierania danych o id kwot vat dokumentu: " + ex);
+		}
+		
+			try {
+				String query = String.format("delete from dokument_kwota_netto where id_dokument_ksiegowy = '%d'", id_document); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba usunietych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			} 
+			
+			try {
+				String query = String.format("delete from dokument_kwota_vat where id_dokument_ksiegowy = '%d'", id_document); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba usunietych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			} 
+			
+			try {
+				String query = String.format("delete from dokument_ksiegowy where id_dokument_ksiegowy = '%d'", id_document); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba usunietych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+			
+			for(Integer netId: netIds) {
+				try {
+					String query = String.format("delete from kwota_netto where id_kwota_netto = '%d'", netId); 
+					Statement stm = conn.createStatement();
+					int count = stm.executeUpdate(query);
+					System.out.println("Liczba usuniêtych rekordów " + count);
+					result = true;
+				} catch (SQLException e) {
+					System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+					result = false;
+				}
+			}
+			
+			for(Integer vatId: vatIds) {
+				try {
+					String query = String.format("delete from kwota_vat where id_kwota_vat = '%d'", vatId); 
+					Statement stm = conn.createStatement();
+					int count = stm.executeUpdate(query);
+					System.out.println("Liczba usuniêtych rekordów " + count);
+					result = true;
+				} catch (SQLException e) {
+					System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+					result = false;
+				}
+			}
+		return result;
+	}
+	
 	private Boolean updateLedgerWithName(Connection conn, String name) {
 		Boolean result = false;
 			try {
@@ -1609,6 +1704,67 @@ public class NewDocumentsVatController {
 		tcName.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("nameContractor"));
 		tcDate.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("date"));
 		tcDocumentType.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("documentType"));
+		tcAction.setCellValueFactory(new PropertyValueFactory<>( "value" ));
+		Callback<TableColumn<DocumentTable, String>, TableCell<DocumentTable, String>> cellFactory = 
+                new Callback<TableColumn<DocumentTable, String>, TableCell<DocumentTable, String>>()
+                {
+                    @Override
+                    public TableCell call( final TableColumn<DocumentTable, String> param )
+                    {
+                        final TableCell<DocumentTable, String> cell = new TableCell<DocumentTable, String>()
+                        {
+
+                            final Button btn = new Button( "Usuñ" );
+
+                            @Override
+                            public void updateItem( String item, boolean empty )
+                            {
+                                super.updateItem( item, empty );
+                                if ( empty )
+                                {
+                                    setGraphic( null );
+                                    setText( null );
+                                }
+                                else
+                                {
+                                    btn.setOnAction( ( ActionEvent event ) ->
+                                            {
+                                            	Stage stage = null;
+                                            	Connection conn;
+                                        		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
+                                        		conn = openConnection(connStr);
+                                            	DocumentTable documentTable = getTableView().getItems().get( getIndex() );
+                                                if(deleteDocument(conn, documentTable.getId())) {
+                                                	
+                                                } else {
+                                                	textError.setText("Nie usuniêto dokumentu");
+                                                }
+                                                closeConnection(conn);
+                                                FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
+                    				            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+                    				            Scene scene = null;
+												try {
+													scene = new Scene(loader.load());
+												} catch (Exception e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+                    							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+                    				            stage.setScene(scene);
+                    				            NewDocumentsVatController newDocumentsVatController = loader.<NewDocumentsVatController>getController();
+                    				            newDocumentsVatController.initData(id_uzytkownik, year, month);
+                    				            stage.setResizable(false);
+                    				            stage.show();
+                                    } );
+                                    setGraphic( btn );
+                                    setText( null );
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        tcAction.setCellFactory(cellFactory);
 		Connection conn;
 		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 		conn = openConnection(connStr);
