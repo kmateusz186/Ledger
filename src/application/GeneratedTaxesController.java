@@ -42,6 +42,9 @@ public class GeneratedTaxesController {
 	private TableColumn tcYear;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -58,8 +61,7 @@ public class GeneratedTaxesController {
 			if(tableViewGeneratedTaxes.getSelectionModel().getSelectedItem()!=null) {
 				int id_ledger = tableViewGeneratedTaxes.getSelectionModel().getSelectedItem().getId();
 				Connection conn;
-				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-				conn = openConnection(connStr);
+				conn = openConnection(CONN_STR);
 				String ledgerName = getLedgerName(conn, id_ledger);
 				closeConnection(conn);
 				if(!ledgerName.equals("")) {
@@ -95,9 +97,8 @@ public class GeneratedTaxesController {
 	public void initData(int id_uzytkownik) {
 		this.id_uzytkownik = id_uzytkownik;
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 		tcYear.setCellValueFactory(new PropertyValueFactory<YearTable, String>("year"));
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		tableViewGeneratedTaxes.setItems(FXCollections.observableArrayList(getLedgers(conn)));
 		closeConnection(conn);
 	}

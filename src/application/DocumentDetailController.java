@@ -49,6 +49,8 @@ public class DocumentDetailController {
 	@FXML
 	private AnchorPane anchorPaneEditor;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -88,8 +90,7 @@ public class DocumentDetailController {
 		this.id_uzytkownik = id_uzytkownik;
 		this.id_document = id_document;
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		documentTable = getDocument(conn);
 		if(documentTable!=null) {
 			textNumber.setText(documentTable.getNumber());

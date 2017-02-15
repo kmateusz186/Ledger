@@ -37,6 +37,8 @@ public class MainMenuWindowController implements Initializable {
 	@FXML
 	private AnchorPane anchorPaneEditor;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -104,8 +106,7 @@ public class MainMenuWindowController implements Initializable {
 		
 		Connection conn;
 		User user;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		user = getUser(conn, id_uzytkownik);
 		closeConnection(conn);
 		String name = user.getName();

@@ -49,6 +49,9 @@ public class FixedAssetsController {
 	private TableColumn tcDate;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -105,12 +108,11 @@ public class FixedAssetsController {
 		monthsMap.put(11, "listopad");
 		monthsMap.put(12, "grudzieñ");
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 		tcNumber.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("number"));
 		tcMoney.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("grossAmount"));
 		tcName.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("nameContractor"));
 		tcDate.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("date"));
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		tableViewAssets.setItems(FXCollections.observableArrayList(getFixedAssets(conn)));
 		closeConnection(conn);
 		

@@ -75,6 +75,8 @@ public class FixedAssetDetailController {
 	@FXML
 	private AnchorPane anchorPaneEditor;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -129,8 +131,7 @@ public class FixedAssetDetailController {
 		monthsMap.put(12, "grudzieñ");
 		Double amount = 0.0;
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		documentTable = getFixedAsset(conn);
 		if(documentTable!=null) {
 			textNumber.setText(documentTable.getNumber());

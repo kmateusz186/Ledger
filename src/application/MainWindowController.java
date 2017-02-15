@@ -38,6 +38,8 @@ public class MainWindowController implements Initializable {
 	@FXML
 	private GridPane gridPaneEditor;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	 @FXML
 	    public void handleButtonAction(ActionEvent event) throws IOException {
 		 	Stage stage = null;
@@ -57,8 +59,7 @@ public class MainWindowController implements Initializable {
 		 		if(!textFieldLogin.getText().isEmpty() && !passwordFieldPassword.getText().equals("")) {
 		 			String login = textFieldLogin.getText().toString();
 			 		String password = passwordFieldPassword.getText();
-			 		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-			 		conn = openConnection(connStr);
+			 		conn = openConnection(CONN_STR);
 			 		if(logIn(conn, login, password)) {
 			 			id_uzytkownik = getIdUser(conn, login);
 			            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainMenuWindowFXML.fxml"));
@@ -138,7 +139,7 @@ public class MainWindowController implements Initializable {
 		@Override
 		public void initialize(URL location, ResourceBundle resources) {
 			Connection conn;
-			String connStr = "jdbc:h2:~/db/ledgerdatabase;"
+			String connStr = CONN_STR
 					
 							+ "INIT=create table if not exists sposob_opodatkowania (id_sposob_opodatkowania integer auto_increment primary key, " 
 							+ "nazwa varchar(255) not null)\\;"

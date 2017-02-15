@@ -124,6 +124,9 @@ public class NewDocumentsVatController {
 	private Text textError;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -160,8 +163,7 @@ public class NewDocumentsVatController {
 		} else if(event.getSource()==btnNewDocument) {
 			Double netSum = 0.0;
 			Double vatSum = 0.0;
-			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-			conn = openConnection(connStr);
+			conn = openConnection(CONN_STR);
 				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty() && !textFieldNet1.getText().isEmpty() && !textFieldVat1.getText().isEmpty() && !textFieldNet2.getText().isEmpty() && !textFieldVat2.getText().isEmpty() && !textFieldNet3.getText().isEmpty() && !textFieldVat3.getText().isEmpty() && !textFieldNet4.getText().isEmpty() && !textFieldVat4.getText().isEmpty() && !textFieldNet5.getText().isEmpty() && !textFieldVat5.getText().isEmpty()) {
 					numberDocument = textFieldNumberDocument.getText().toString();
 					documentType = choiceBoxDocumentTypes.getValue().toString();
@@ -243,8 +245,7 @@ public class NewDocumentsVatController {
 				}
 			closeConnection(conn);
 		} else if(event.getSource()==btnCreateExcel) {
-			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-			conn = openConnection(connStr);
+			conn = openConnection(CONN_STR);
 				if(createExcel(conn)) {
 					if(createExcelWithVat(conn)) {
 						
@@ -880,7 +881,7 @@ public class NewDocumentsVatController {
 		return result;
 	}
 	
-	private Boolean deleteDocument(Connection conn, int id_document) {
+	private Boolean deleteVatDocument(Connection conn, int id_document) {
 		Boolean result = false;
 		ArrayList<Integer> netIds = new ArrayList<>();
 		ArrayList<Integer> vatIds = new ArrayList<>();
@@ -1731,10 +1732,9 @@ public class NewDocumentsVatController {
                                             {
                                             	Stage stage = null;
                                             	Connection conn;
-                                        		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-                                        		conn = openConnection(connStr);
+                                        		conn = openConnection(CONN_STR);
                                             	DocumentTable documentTable = getTableView().getItems().get( getIndex() );
-                                                if(deleteDocument(conn, documentTable.getId())) {
+                                                if(deleteVatDocument(conn, documentTable.getId())) {
                                                 	
                                                 } else {
                                                 	textError.setText("Nie usuniêto dokumentu");
@@ -1766,8 +1766,7 @@ public class NewDocumentsVatController {
                 };
         tcAction.setCellFactory(cellFactory);
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		choiceBoxDocumentTypes.setItems(FXCollections.observableArrayList(getDocumentTypes(conn)));
 		tableViewDocuments.setItems(FXCollections.observableArrayList(getDocuments(conn, monthNumber)));
 		contractors = getContractors(conn);

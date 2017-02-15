@@ -30,6 +30,7 @@ public class ShowDataMenuController {
 	private Button btnMainMenu;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;

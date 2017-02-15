@@ -49,6 +49,9 @@ public class NewLedgerController implements Initializable {
 	private Text textError;
 	@FXML
 	private ListView<String> listViewLedgers;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -64,8 +67,7 @@ public class NewLedgerController implements Initializable {
 			stage.show();
 		} else if(event.getSource()==btnNewLedger) {
 			if(!textFieldYear.getText().isEmpty()) {
-				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-				conn = openConnection(connStr);
+				conn = openConnection(CONN_STR);
 				String year = textFieldYear.getText().toString();
 				if(!ifLedgerExists(conn, year)) {
 					if(addLedger(conn, year)) {
@@ -162,8 +164,7 @@ public class NewLedgerController implements Initializable {
 	public void initData(int id_uzytkownik) {
 		Connection conn;
 		this.id_uzytkownik = id_uzytkownik;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		listViewLedgers.setItems(FXCollections.observableArrayList(getLedgers(conn)));
 		closeConnection(conn);
 	}

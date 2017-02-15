@@ -55,6 +55,8 @@ public class EquipmentDetailController {
 	@FXML
 	private AnchorPane anchorPaneEditor;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -107,8 +109,7 @@ public class EquipmentDetailController {
 		monthsMap.put(11, "listopad");
 		monthsMap.put(12, "grudzieñ");
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		documentTable = getDocument(conn);
 		if(documentTable!=null) {
 			textNumber.setText(documentTable.getNumber());

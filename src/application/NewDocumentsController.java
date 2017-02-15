@@ -101,6 +101,9 @@ public class NewDocumentsController {
 	private Text textError;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -127,8 +130,7 @@ public class NewDocumentsController {
 			stage.show();
 			
 		} else if(event.getSource()==btnNewDocument) {
-			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-			conn = openConnection(connStr);
+			conn = openConnection(CONN_STR);
 				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textFieldGrossAmount.getText().isEmpty() && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty()) {
 					numberDocument = textFieldNumberDocument.getText().toString();
 					documentType = choiceBoxDocumentTypes.getValue().toString();
@@ -199,8 +201,7 @@ public class NewDocumentsController {
 				}
 			closeConnection(conn);
 		} else if(event.getSource()==btnCreateExcel) {
-			String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-			conn = openConnection(connStr);
+			conn = openConnection(CONN_STR);
 			if(createExcel(conn)) {
 					
 			} else {
@@ -973,8 +974,31 @@ public class NewDocumentsController {
                                 {
                                     btn.setOnAction( ( ActionEvent event ) ->
                                             {
+                                            	Stage stage = null;
+                                            	Connection conn;
+                                        		conn = openConnection(CONN_STR);
                                             	DocumentTable documentTable = getTableView().getItems().get( getIndex() );
-                                                System.out.println( documentTable.getNameContractor() );
+                                                if(deleteDocument(conn, documentTable.getId())) {
+                                                	
+                                                } else {
+                                                	textError.setText("Nie usuniêto dokumentu");
+                                                }
+                                                closeConnection(conn);
+                                                FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+                    				            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+                    				            Scene scene = null;
+												try {
+													scene = new Scene(loader.load());
+												} catch (Exception e) {
+													// TODO Auto-generated catch block
+													e.printStackTrace();
+												}
+                    							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+                    				            stage.setScene(scene);
+                    				            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
+                    				            newDocumentsController.initData(id_uzytkownik, year, month);
+                    				            stage.setResizable(false);
+                    				            stage.show();
                                     } );
                                     setGraphic( btn );
                                     setText( null );
@@ -986,8 +1010,7 @@ public class NewDocumentsController {
                 };
         tcAction.setCellFactory(cellFactory);
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		choiceBoxDocumentTypes.setItems(FXCollections.observableArrayList(getDocumentTypes(conn)));
 		tableViewDocuments.setItems(FXCollections.observableArrayList(getDocuments(conn, monthNumber)));
 		contractors = getContractors(conn);
@@ -1016,6 +1039,21 @@ public class NewDocumentsController {
 				}
 			}
 		});
+	}
+	
+	private Boolean deleteDocument(Connection conn, int id_document) {
+		Boolean result = false;
+			try {
+				String query = String.format("delete from dokument_ksiegowy where id_dokument_ksiegowy = '%d'", id_document); 
+				Statement stm = conn.createStatement();
+				int count = stm.executeUpdate(query);
+				System.out.println("Liczba usunietych rekordów " + count);
+				result = true;
+			} catch (SQLException e) {
+				System.out.println("B³¹d przy przetwarzaniu danych: " + e);
+				result = false;
+			}
+		return result;
 	}
 	
 	private HashMap<String, String> getContractors(Connection conn) {

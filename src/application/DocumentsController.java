@@ -47,6 +47,9 @@ public class DocumentsController {
 	private TableColumn tcDate;
 	@FXML
 	private AnchorPane anchorPaneEditor;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -90,13 +93,12 @@ public class DocumentsController {
 	public void initData(int id_uzytkownik) {
 		this.id_uzytkownik = id_uzytkownik;
 		Connection conn;
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 		tcNumber.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("number"));
 		tcMoney.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("grossAmount"));
 		tcName.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("nameContractor"));
 		tcDocumentType.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("documentType"));
 		tcDate.setCellValueFactory(new PropertyValueFactory<DocumentTable, String>("date"));
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		tableViewDocuments.setItems(FXCollections.observableArrayList(getDocuments(conn)));
 		closeConnection(conn);
 	}

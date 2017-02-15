@@ -66,6 +66,8 @@ public class CreateUserController implements Initializable {
 	@FXML
 	private Text textError;
 	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
@@ -77,7 +79,6 @@ public class CreateUserController implements Initializable {
 			if(!textFieldLogin.getText().isEmpty() && !passwordFieldPassword.getText().equals("") && !passwordFieldRepeatPassword.getText().equals("") && !textFieldName.getText().isEmpty() && !textFieldSurname.getText().isEmpty() && choiceBoxVAT.getValue()!=null && choiceBoxWayTax.getValue()!=null && choiceBoxPeriod.getValue()!=null && !textFieldNip.getText().isEmpty() && !textFieldNameCompany.getText().isEmpty() && !textFieldAddress.getText().isEmpty()) {
 				if(passwordFieldPassword.getText().equals(passwordFieldRepeatPassword.getText())) {
 					System.out.println(passwordFieldPassword.getText() + " " + passwordFieldRepeatPassword.getText());
-					String connStr = "jdbc:h2:~/db/ledgerdatabase;";
 																			
 					String login = textFieldLogin.getText().toString();
 					String password = passwordFieldPassword.getText();
@@ -89,7 +90,7 @@ public class CreateUserController implements Initializable {
 					String nip = textFieldNip.getText().toString();
 					String nameCompany = textFieldNameCompany.getText().toString();
 					String address = textFieldAddress.getText().toString();
-					conn = openConnection(connStr);
+					conn = openConnection(CONN_STR);
 					
 					if(!ifUserExists(conn, login)) {
 						if(addUser(conn, login, password, name, surname, vat, wayTax, period, nip, nameCompany, address)) {
@@ -202,8 +203,7 @@ public class CreateUserController implements Initializable {
 			} 
 		});
 		choiceBoxVAT.setItems(FXCollections.observableArrayList("tak", "nie"));
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		choiceBoxWayTax.setItems(FXCollections.observableArrayList(getWayTaxList(conn)));
 		choiceBoxPeriod.setItems(FXCollections.observableArrayList(getPeriodList(conn)));
 		closeConnection(conn);	

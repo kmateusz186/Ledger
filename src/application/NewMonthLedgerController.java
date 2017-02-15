@@ -53,6 +53,9 @@ public class NewMonthLedgerController implements Initializable {
 	private Text textNewMonth;
 	@FXML
 	private ListView<String> listViewMonths;
+	
+	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
+	
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
@@ -68,8 +71,7 @@ public class NewMonthLedgerController implements Initializable {
 			stage.show();
 		} else if(event.getSource()==btnNewMonth) {
 			if(choiceBoxMonths.getValue()!=null) {
-				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-				conn = openConnection(connStr);
+				conn = openConnection(CONN_STR);
 				String month = choiceBoxMonths.getValue().toString();
 				int month_number = monthsMap.get(month);
 				if(!ifMonthExists(conn, month_number)) {
@@ -96,8 +98,7 @@ public class NewMonthLedgerController implements Initializable {
 		} else if(event.getSource()==btnNewDocuments) {
 			if(listViewMonths.getSelectionModel().getSelectedItem()!=null) {
 				String month = listViewMonths.getSelectionModel().getSelectedItem();
-				String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-				conn = openConnection(connStr);
+				conn = openConnection(CONN_STR);
 				if(ifVatUser(conn)) {
 					FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsVatFXML.fxml"));
 		            stage = (Stage) anchorPaneEditor.getScene().getWindow();
@@ -204,8 +205,7 @@ public class NewMonthLedgerController implements Initializable {
 		this.year = year;
 		Connection conn;
 		choiceBoxMonths.setItems(FXCollections.observableArrayList("styczeñ", "luty", "marzec", "kwiecieñ", "maj", "czerwiec", "lipiec", "sierpieñ", "wrzesieñ", "paŸdziernik", "listopad", "grudzieñ"));
-		String connStr = "jdbc:h2:~/db/ledgerdatabase;";
-		conn = openConnection(connStr);
+		conn = openConnection(CONN_STR);
 		listViewMonths.setItems(FXCollections.observableArrayList(getMonths(conn)));
 		closeConnection(conn);
 		monthsMap = new LinkedHashMap<>();
