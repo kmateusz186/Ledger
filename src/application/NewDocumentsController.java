@@ -1,5 +1,7 @@
 package application;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -203,7 +205,24 @@ public class NewDocumentsController {
 		} else if(event.getSource()==btnCreateExcel) {
 			conn = openConnection(CONN_STR);
 			if(createExcel(conn)) {
-					
+				textError.setText("Wygenerowano pliki!");	
+				String nip = getUserNip(conn);
+				if (Desktop.isDesktopSupported()) {
+				    try {
+				        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/KPIR_" + year + "_" + nip + ".xlsx");
+				        Desktop.getDesktop().open(myFile);
+				    } catch (IOException ex) {
+				    	textError.setText("B³¹d odczytu pliku");
+				    }
+				}
+				if (Desktop.isDesktopSupported()) {
+				    try {
+				        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/ZALICZKA_" + year + "_" + nip + ".xlsx");
+				        Desktop.getDesktop().open(myFile);
+				    } catch (IOException ex) {
+				    	textError.setText("B³¹d odczytu pliku");
+				    }
+				}
 			} else {
 				textError.setText("Wyst¹pi³ b³¹d, nie utworzono pliku");
 			}
