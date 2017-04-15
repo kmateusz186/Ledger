@@ -29,22 +29,22 @@
                   <Font size="23.0" />
                </font>
             </Text>
-            <Button fx:id="btnShowLedgers" mnemonicParsing="false" onAction="#handleButtonAction" text="Księgi i VAT" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Button fx:id="btnShowLedgers" mnemonicParsing="false" onAction="#handleButtonAction" prefWidth="358.0" text="Księgi i VAT" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button fx:id="btnShowAddedDocuments" mnemonicParsing="false" onAction="#handleButtonAction" text="Dodane dokumenty księgowe" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+            <Button fx:id="btnShowAddedDocuments" mnemonicParsing="false" onAction="#handleButtonAction" prefWidth="358.0" text="Dodane dokumenty księgowe" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2">
                <font>
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button fx:id="btnGeneratedTaxes" mnemonicParsing="false" onAction="#handleButtonAction" text="Zaliczki na podatek" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+            <Button fx:id="btnGeneratedTaxes" mnemonicParsing="false" onAction="#handleButtonAction" prefWidth="358.0" text="Zaliczki na podatek" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
                <font>
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button fx:id="btnEquipment" mnemonicParsing="false" onAction="#handleButtonAction" text="Wyposażenie" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
+            <Button fx:id="btnEquipment" mnemonicParsing="false" onAction="#handleButtonAction" prefWidth="358.0" text="Wyposażenie" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="4">
                <font>
                   <Font size="20.0" />
                </font>

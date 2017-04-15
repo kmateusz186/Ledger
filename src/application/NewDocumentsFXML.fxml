@@ -42,7 +42,7 @@
                   <Font size="23.0" />
                </font>
             </Text>
-            <Button fx:id="btnCreateExcel" mnemonicParsing="false" onAction="#handleButtonAction" text="Wygeneruj gotowy plik księgi" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
+            <Button fx:id="btnCreateExcel" mnemonicParsing="false" onAction="#handleButtonAction" text="Wygeneruj potrzebne pliki" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
                <GridPane.margin>
                   <Insets right="20.0" />
                </GridPane.margin>

@@ -7,68 +7,68 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainWindowController">
-   <children>
-      <GridPane fx:id="gridPaneEditor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zaloguj się lub stwórz konto jeśli jeszcze go nie posiadasz" textAlignment="CENTER" wrappingWidth="604.13671875" GridPane.columnSpan="2" GridPane.halignment="CENTER">
-               <font>
-                  <Font size="23.0" />
-               </font>
-            </Text>
-            <Label text="Login" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-            </Label>
-            <TextField fx:id="textFieldLogin" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="Hasło" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-               <font>
-                  <Font name="System Bold" size="20.0" />
-               </font>
-            </Label>
-            <PasswordField fx:id="passwordFieldPassword" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </PasswordField>
-            <Button fx:id="btnLogIn" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonAction" text="Zaloguj się" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="20.0" />
-               </GridPane.margin>
-            </Button>
-            <Button fx:id="btnCreateUser" mnemonicParsing="false" onAction="#handleButtonAction" text="Stwórz konto" GridPane.halignment="LEFT" GridPane.rowIndex="4">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="30.0" />
-               </GridPane.margin>
-            </Button>
-            <Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-            </Text>
-         </children>
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="454.0" minWidth="10.0" prefWidth="240.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="478.0" minWidth="10.0" prefWidth="442.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints maxHeight="170.0" minHeight="10.0" prefHeight="170.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="154.0" minHeight="10.0" prefHeight="51.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="268.0" minHeight="10.0" prefHeight="248.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-      </GridPane>
-   </children>
+<AnchorPane fx:id="anchorPaneEditor" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainWindowController">
+	<children>
+		<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+			<children>
+				<Text strokeType="OUTSIDE" strokeWidth="0.0" text="Zaloguj się lub stwórz konto jeśli jeszcze go nie posiadasz" textAlignment="CENTER" wrappingWidth="604.13671875" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+					<font>
+						<Font size="23.0" />
+					</font>
+				</Text>
+				<Label text="Login" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+					<font>
+						<Font name="System Bold" size="20.0" />
+					</font>
+				</Label>
+				<TextField fx:id="textFieldLogin" GridPane.columnIndex="1" GridPane.rowIndex="1">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<Label text="Hasło" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+					<font>
+						<Font name="System Bold" size="20.0" />
+					</font>
+				</Label>
+				<PasswordField fx:id="passwordFieldPassword" GridPane.columnIndex="1" GridPane.rowIndex="2">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</PasswordField>
+				<Button fx:id="btnLogIn" defaultButton="true" mnemonicParsing="false" onAction="#handleButtonAction" text="Zaloguj się" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets right="20.0" />
+					</GridPane.margin>
+				</Button>
+				<Button fx:id="btnCreateUser" mnemonicParsing="false" onAction="#handleButtonAction" text="Stwórz konto" GridPane.halignment="LEFT" GridPane.rowIndex="4">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="30.0" />
+					</GridPane.margin>
+				</Button>
+				<Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+					<font>
+						<Font name="System Bold Italic" size="18.0" />
+					</font>
+				</Text>
+			</children>
+			<columnConstraints>
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="454.0" minWidth="10.0" prefWidth="240.0" />
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="478.0" minWidth="10.0" prefWidth="442.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints maxHeight="170.0" minHeight="10.0" prefHeight="170.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="154.0" minHeight="10.0" prefHeight="51.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="194.0" minHeight="10.0" prefHeight="64.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="268.0" minHeight="10.0" prefHeight="248.0" vgrow="SOMETIMES" />
+			</rowConstraints>
+		</GridPane>
+	</children>
 </AnchorPane>

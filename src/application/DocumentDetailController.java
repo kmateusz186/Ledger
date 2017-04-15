@@ -151,8 +151,8 @@ public class DocumentDetailController {
 		if(netAmount == 0.0) {
 			document.setNetAmount(null);
 		} else {
-			document.setNetAmount(String.valueOf(netAmount));
-		}
+			document.setNetAmount(String.format("%.2f", netAmount));
+		} 
 		
 		try {
 			String query = String.format("select kwota_vat.wartosc "
@@ -171,11 +171,11 @@ public class DocumentDetailController {
 		if(vatAmount == 0.0) {
 			document.setVatAmount(null);
 		} else {
-			document.setVatAmount(String.valueOf(vatAmount));
+			document.setVatAmount(String.format("%.2f", vatAmount));
 		}
 		
 		if(document.getGrossAmount() == null) {
-			document.setGrossAmount(String.valueOf(netAmount + vatAmount));
+			document.setGrossAmount(String.format("%.2f", netAmount + vatAmount));
 		}
 		return document;
 	}

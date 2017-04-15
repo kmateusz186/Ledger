@@ -78,7 +78,7 @@ public class LedgersVatController {
 					        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/" + ledgerName);
 					        Desktop.getDesktop().open(myFile);
 					    } catch (IOException ex) {
-					    	textError.setText("B³¹d odczytu pliku");
+					    	textError.setText("B³¹d odczytu pliku lub brak programu do obs³ugi");
 					    }
 					}
 				} else {
@@ -102,7 +102,7 @@ public class LedgersVatController {
 					        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/" + ledgerName);
 					        Desktop.getDesktop().open(myFile);
 					    } catch (IOException ex) {
-					    	textError.setText("B³¹d odczytu pliku");
+					    	textError.setText("B³¹d odczytu pliku lub brak programu do obs³ugi");
 					    }
 					}
 				} else {

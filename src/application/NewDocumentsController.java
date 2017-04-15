@@ -134,21 +134,57 @@ public class NewDocumentsController {
 		} else if(event.getSource()==btnNewDocument) {
 			conn = openConnection(CONN_STR);
 				if(!textFieldNumberDocument.getText().isEmpty() && choiceBoxDocumentTypes.getValue()!=null && datePickerDateDocument.getValue()!=null && !textFieldGrossAmount.getText().isEmpty() && !textAreaDescription.getText().isEmpty() && comboBoxNameContractor.getValue()!=null && !textFieldAddressContractor.getText().isEmpty()) {
-					numberDocument = textFieldNumberDocument.getText().toString();
-					documentType = choiceBoxDocumentTypes.getValue().toString();
-					ld = datePickerDateDocument.getValue();
-					c =  Calendar.getInstance();
-					System.out.println(ld.getMonthValue());
-					c.set(ld.getYear(), ld.getMonthValue()-1, ld.getDayOfMonth());
-					date = c.getTime();
-					grossAmount = textFieldGrossAmount.getText().toString();
-					description = textAreaDescription.getText().toString();
-					nameContractor = comboBoxNameContractor.getValue().toString();
 					addressContractor = textFieldAddressContractor.getText().toString();
-					
-					Double amount = Double.valueOf(grossAmount.replace(',', '.'));
-					if(documentType.equals("zakup œrodków trwa³ych")) {
-						if(amount > 3500) {
+					if(addressContractor.indexOf(',') >= 0) {
+						numberDocument = textFieldNumberDocument.getText().toString();
+						documentType = choiceBoxDocumentTypes.getValue().toString();
+						ld = datePickerDateDocument.getValue();
+						c =  Calendar.getInstance();
+						System.out.println(ld.getMonthValue());
+						c.set(ld.getYear(), ld.getMonthValue()-1, ld.getDayOfMonth());
+						date = c.getTime();
+						grossAmount = textFieldGrossAmount.getText().toString();
+						description = textAreaDescription.getText().toString();
+						nameContractor = comboBoxNameContractor.getValue().toString();
+						
+						Double amount = Double.valueOf(grossAmount.replace(',', '.'));
+						if(documentType.equals("zakup œrodków trwa³ych")) {
+							if(amount > 3500) {
+								if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
+									FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+						            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+						            Scene scene = new Scene(loader.load());
+									scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+						            stage.setScene(scene);
+						            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
+						            newDocumentsController.initData(id_uzytkownik, year, month);
+						            stage.setResizable(false);
+						            stage.show();
+								} else {
+									textError.setText("Wyst¹pi³ b³¹d, nie dodano dokumentu");
+								}
+							} else {
+								textError.setText("Kwota œrodka trwa³ego musi przekroczyæ 3500 z³");
+							}
+						} else if(documentType.equals("zakup wyposa¿enia")) {
+									if(amount > 1500) {
+										if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor) && addNewDocument(conn, numberDocument, "zakupy/wydatki", date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
+											FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
+								            stage = (Stage) anchorPaneEditor.getScene().getWindow();
+								            Scene scene = new Scene(loader.load());
+											scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+								            stage.setScene(scene);
+								            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
+								            newDocumentsController.initData(id_uzytkownik, year, month);
+								            stage.setResizable(false);
+								            stage.show();
+										} else {
+											textError.setText("Wyst¹pi³ b³¹d, nie dodano dokumentu");
+										}
+							} else {
+								textError.setText("Kwota wyposa¿enia musi przekroczyæ 1500 z³");
+							}
+						} else {
 							if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
 								FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
 					            stage = (Stage) anchorPaneEditor.getScene().getWindow();
@@ -162,42 +198,11 @@ public class NewDocumentsController {
 							} else {
 								textError.setText("Wyst¹pi³ b³¹d, nie dodano dokumentu");
 							}
-						} else {
-							textError.setText("Kwota œrodka trwa³ego musi przekroczyæ 3500 z³");
-						}
-					} else if(documentType.equals("zakup wyposa¿enia")) {
-								if(amount > 1500) {
-									if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor) && addNewDocument(conn, numberDocument, "zakupy/wydatki", date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
-										FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
-							            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-							            Scene scene = new Scene(loader.load());
-										scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-							            stage.setScene(scene);
-							            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-							            newDocumentsController.initData(id_uzytkownik, year, month);
-							            stage.setResizable(false);
-							            stage.show();
-									} else {
-										textError.setText("Wyst¹pi³ b³¹d, nie dodano dokumentu");
-									}
-						} else {
-							textError.setText("Kwota wyposa¿enia musi przekroczyæ 1500 z³");
 						}
 					} else {
-						if(addNewDocument(conn, numberDocument, documentType, date, netAmount, vatAmount, grossAmount, description, nameContractor, addressContractor)) {
-							FXMLLoader loader = new FXMLLoader(getClass().getResource("NewDocumentsFXML.fxml"));
-				            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-				            Scene scene = new Scene(loader.load());
-							scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-				            stage.setScene(scene);
-				            NewDocumentsController newDocumentsController = loader.<NewDocumentsController>getController();
-				            newDocumentsController.initData(id_uzytkownik, year, month);
-				            stage.setResizable(false);
-				            stage.show();
-						} else {
-							textError.setText("Wyst¹pi³ b³¹d, nie dodano dokumentu");
-						}
+						textError.setText("Wpisano niepoprawny format adresu");
 					}
+					
 				} else {
 					textError.setText("Pola nie s¹ wype³nione!");
 				}
@@ -212,7 +217,7 @@ public class NewDocumentsController {
 				        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/KPIR_" + year + "_" + nip + ".xlsx");
 				        Desktop.getDesktop().open(myFile);
 				    } catch (IOException ex) {
-				    	textError.setText("B³¹d odczytu pliku");
+				    	textError.setText("B³¹d odczytu pliku lub brak programu do obs³ugi");
 				    }
 				}
 				if (Desktop.isDesktopSupported()) {
@@ -220,7 +225,7 @@ public class NewDocumentsController {
 				        File myFile = new File(System.getProperty("user.dir") + "/CreatedFiles/ZALICZKA_" + year + "_" + nip + ".xlsx");
 				        Desktop.getDesktop().open(myFile);
 				    } catch (IOException ex) {
-				    	textError.setText("B³¹d odczytu pliku");
+				    	textError.setText("B³¹d odczytu pliku lub brak programu do obs³ugi");
 				    }
 				}
 			} else {
@@ -768,8 +773,8 @@ public class NewDocumentsController {
 			try {
 				String query = String.format("update miesiac set suma_wartosc_sprz_towar = '%s', suma_poz_przych = '%s', suma_zak_towar = '%s', "
 						+ "suma_koszt_ub = '%s', suma_wynagrodzen = '%s', suma_wydatkow = '%s', suma_koszt_bad_rozw = '%s', lp = %d "
-						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok where miesiac.id_rok = rok.id_rok "
-						+ "and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn) + getOrderNumberFromLastMonth(conn), monthNumber, year); 
+						+ "where id_miesiac = (select miesiac.id_miesiac from miesiac, rok, uzytkownik where miesiac.id_rok = rok.id_rok "
+						+ "and rok.id_uzytkownik = uzytkownik.id_uzytkownik and uzytkownik.id_uzytkownik = '%d' and month(miesiac.data) = '%d' and year(rok.data) = '%s')", incomeSum, incomeRSum, buyGSum, expenseInSum, rewardSum, expenseSum, expenseResSum, getDocumentOrderNumber(conn) + getOrderNumberFromLastMonth(conn), id_uzytkownik, monthNumber, year); 
 				Statement stm = conn.createStatement();
 				int count = stm.executeUpdate(query);
 				System.out.println("Liczba dodanych rekordów " + count);
@@ -1039,7 +1044,9 @@ public class NewDocumentsController {
 		comboBoxNameContractor.setItems(FXCollections.observableArrayList(nameContractors));
 		closeConnection(conn);
 		setAmountFields();
-		textFieldAddressContractor.setPromptText("[Miejscowoœæ] [kod_pocztowy], [ulica] [numer]");
+		Tooltip tooltipAddress = new Tooltip();
+		tooltipAddress.setText("Miejscowoœæ kod_pocztowy, ul. ulica numer");
+		textFieldAddressContractor.setTooltip(tooltipAddress);
 		choiceBoxDocumentTypes.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
 			@Override

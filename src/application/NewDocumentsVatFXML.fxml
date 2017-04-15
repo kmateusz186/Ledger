@@ -8,264 +8,264 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 <AnchorPane fx:id="anchorPaneEditor" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.NewDocumentsVatController">
-   <children>
-      <GridPane prefHeight="561.0" prefWidth="756.0">
-         <children>
-            <Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#handleButtonAction" text="Wróć do wyboru miesiąca" GridPane.halignment="LEFT" GridPane.rowIndex="16">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="20.0" />
-               </GridPane.margin>
-            </Button>
-            <Text fx:id="textNewDocument" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER">
-               <font>
-                  <Font size="23.0" />
-               </font>
-            </Text>
-            <Button fx:id="btnCreateExcel" mnemonicParsing="false" onAction="#handleButtonAction" text="Wygeneruj gotowy plik księgi" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="20.0" />
-               </GridPane.margin>
-            </Button>
-            <Button fx:id="btnShowDocument" mnemonicParsing="false" onAction="#handleButtonAction" text="Zobacz szczegóły dokumentu" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
-               <font>
-                  <Font size="15.0" />
-               </font>
-            </Button>
-            <Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="84.0" text="Wyloguj" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="20.0" />
-               </GridPane.margin>
-            </Button>
-            <Label text="Numer dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <TextField fx:id="textFieldNumberDocument" GridPane.columnIndex="1" GridPane.rowIndex="1">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="Typ dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <ChoiceBox fx:id="choiceBoxDocumentTypes" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </ChoiceBox>
-            <Label text="Data" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <DatePicker fx:id="datePickerDateDocument" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </DatePicker>
-            <TextField fx:id="textFieldVat1" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
-               <GridPane.margin>
-                  <Insets left="120.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldVat2" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="6">
-               <GridPane.margin>
-                  <Insets left="120.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldVat3" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="7">
-               <GridPane.margin>
-                  <Insets left="120.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="Opis" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <TextArea fx:id="textAreaDescription" GridPane.columnIndex="1" GridPane.rowIndex="10">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </TextArea>
-            <Label text="Nazwa kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <Label text="Adres kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-            </Label>
-            <TextField fx:id="textFieldAddressContractor" GridPane.columnIndex="1" GridPane.rowIndex="12">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dokumenty w bazie na ten miesiąc" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="14">
-               <font>
-                  <Font size="23.0" />
-               </font>
-            </Text>
-            <Button fx:id="btnNewDocument" mnemonicParsing="false" onAction="#handleButtonAction" text="Dodaj dokument" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
-               <font>
-                  <Font size="15.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="20.0" />
-               </GridPane.margin>
-            </Button>
-            <Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
-               <font>
-                  <Font name="System Bold Italic" size="18.0" />
-               </font>
-            </Text>
-            <TableView fx:id="tableViewDocuments" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="15">
-               <columns>
-                  <TableColumn fx:id="tcDate" prefWidth="125.0" text="Data transakcji" />
-                  <TableColumn fx:id="tcNumber" prefWidth="137.0" text="Numer dokumentu" />
-                  <TableColumn fx:id="tcName" prefWidth="155.0" text="Nazwa kontrahenta" />
-                  <TableColumn fx:id="tcMoney" prefWidth="107.0" text="Kwota brutto [zł]" />
-                  <TableColumn fx:id="tcDocumentType" prefWidth="106.0" text="Typ dokumentu" />
-                  <TableColumn fx:id="tcAction" prefWidth="71.0" text="Akcja" />
-               </columns>
-               <GridPane.margin>
-                  <Insets left="20.0" right="20.0" />
-               </GridPane.margin>
-            </TableView>
-            <ComboBox fx:id="comboBoxNameContractor" editable="true" onAction="#handleButtonAction" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
-               <GridPane.margin>
-                  <Insets left="20.0" right="150.0" />
-               </GridPane.margin>
-            </ComboBox>
-            <TextField fx:id="textFieldNet1" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="5">
-               <GridPane.margin>
-                  <Insets left="150.0" right="400.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldNet2" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="6">
-               <GridPane.margin>
-                  <Insets left="150.0" right="400.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldNet3" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="7">
-               <GridPane.margin>
-                  <Insets left="150.0" right="400.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="Kwota netto" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="4">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="200.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="Kwota VAT" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets right="200.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="23%" GridPane.rowIndex="5">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="50.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="8%" GridPane.rowIndex="6">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="50.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="5%" GridPane.rowIndex="7">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="50.0" />
-               </GridPane.margin>
-            </Label>
-            <Label text="0%" GridPane.rowIndex="8">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="50.0" />
-               </GridPane.margin>
-            </Label>
-            <TextField fx:id="textFieldNet4" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="8">
-               <GridPane.margin>
-                  <Insets left="150.0" right="400.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldVat4" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="8">
-               <GridPane.margin>
-                  <Insets left="120.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-            <Label text="zw." GridPane.rowIndex="9">
-               <font>
-                  <Font name="System Bold" size="16.0" />
-               </font>
-               <GridPane.margin>
-                  <Insets left="50.0" />
-               </GridPane.margin>
-            </Label>
-            <TextField fx:id="textFieldNet5" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="9">
-               <GridPane.margin>
-                  <Insets left="150.0" right="400.0" />
-               </GridPane.margin>
-            </TextField>
-            <TextField fx:id="textFieldVat5" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="9">
-               <GridPane.margin>
-                  <Insets left="120.0" right="150.0" />
-               </GridPane.margin>
-            </TextField>
-         </children>
-         <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="404.0" minWidth="10.0" prefWidth="238.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="496.0" minWidth="10.0" prefWidth="444.0" />
-         </columnConstraints>
-         <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="24.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="40.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="23.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="93.0" minHeight="10.0" prefHeight="89.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-         </rowConstraints>
-      </GridPane>
-   </children>
+	<children>
+		<GridPane prefHeight="561.0" prefWidth="756.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+			<children>
+				<Button fx:id="btnMainMenu" mnemonicParsing="false" onAction="#handleButtonAction" text="Wróć do wyboru miesiąca" GridPane.halignment="LEFT" GridPane.rowIndex="16">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="20.0" />
+					</GridPane.margin>
+				</Button>
+				<Text fx:id="textNewDocument" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER">
+					<font>
+						<Font size="23.0" />
+					</font>
+				</Text>
+				<Button fx:id="btnCreateExcel" mnemonicParsing="false" onAction="#handleButtonAction" text="Wygeneruj potrzebne pliki" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets right="20.0" />
+					</GridPane.margin>
+				</Button>
+				<Button fx:id="btnShowDocument" mnemonicParsing="false" onAction="#handleButtonAction" text="Zobacz szczegóły dokumentu" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="16">
+					<font>
+						<Font size="15.0" />
+					</font>
+				</Button>
+				<Button fx:id="btnLogOut" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="37.0" prefWidth="84.0" text="Wyloguj" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets right="20.0" />
+					</GridPane.margin>
+				</Button>
+				<Label text="Numer dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<TextField fx:id="textFieldNumberDocument" GridPane.columnIndex="1" GridPane.rowIndex="1">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<Label text="Typ dokumentu" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<ChoiceBox fx:id="choiceBoxDocumentTypes" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</ChoiceBox>
+				<Label text="Data" GridPane.halignment="RIGHT" GridPane.rowIndex="3">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<DatePicker fx:id="datePickerDateDocument" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</DatePicker>
+				<TextField fx:id="textFieldVat1" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+					<GridPane.margin>
+						<Insets left="120.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldVat2" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+					<GridPane.margin>
+						<Insets left="120.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldVat3" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+					<GridPane.margin>
+						<Insets left="120.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<Label text="Opis" GridPane.halignment="RIGHT" GridPane.rowIndex="10">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<TextArea fx:id="textAreaDescription" GridPane.columnIndex="1" GridPane.rowIndex="10">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</TextArea>
+				<Label text="Nazwa kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="11">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<Label text="Adres kontrahenta" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+				</Label>
+				<TextField fx:id="textFieldAddressContractor" GridPane.columnIndex="1" GridPane.rowIndex="12">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dokumenty w bazie na ten miesiąc" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="14">
+					<font>
+						<Font size="23.0" />
+					</font>
+				</Text>
+				<Button fx:id="btnNewDocument" mnemonicParsing="false" onAction="#handleButtonAction" text="Dodaj dokument" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="13">
+					<font>
+						<Font size="15.0" />
+					</font>
+					<GridPane.margin>
+						<Insets right="20.0" />
+					</GridPane.margin>
+				</Button>
+				<Text fx:id="textError" fill="#d00a0a" strokeType="OUTSIDE" strokeWidth="0.0" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="13">
+					<font>
+						<Font name="System Bold Italic" size="18.0" />
+					</font>
+				</Text>
+				<TableView fx:id="tableViewDocuments" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="2" GridPane.rowIndex="15">
+					<columns>
+						<TableColumn fx:id="tcDate" prefWidth="125.0" text="Data transakcji" />
+						<TableColumn fx:id="tcNumber" prefWidth="137.0" text="Numer dokumentu" />
+						<TableColumn fx:id="tcName" prefWidth="155.0" text="Nazwa kontrahenta" />
+						<TableColumn fx:id="tcMoney" prefWidth="107.0" text="Kwota brutto [zł]" />
+						<TableColumn fx:id="tcDocumentType" prefWidth="106.0" text="Typ dokumentu" />
+						<TableColumn fx:id="tcAction" prefWidth="71.0" text="Akcja" />
+					</columns>
+					<GridPane.margin>
+						<Insets left="20.0" right="20.0" />
+					</GridPane.margin>
+				</TableView>
+				<ComboBox fx:id="comboBoxNameContractor" editable="true" onAction="#handleButtonAction" prefWidth="311.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+					<GridPane.margin>
+						<Insets left="20.0" right="150.0" />
+					</GridPane.margin>
+				</ComboBox>
+				<TextField fx:id="textFieldNet1" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="5">
+					<GridPane.margin>
+						<Insets left="150.0" right="400.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldNet2" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="6">
+					<GridPane.margin>
+						<Insets left="150.0" right="400.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldNet3" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="7">
+					<GridPane.margin>
+						<Insets left="150.0" right="400.0" />
+					</GridPane.margin>
+				</TextField>
+				<Label text="Kwota netto" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="4">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="200.0" />
+					</GridPane.margin>
+				</Label>
+				<Label text="Kwota VAT" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets right="200.0" />
+					</GridPane.margin>
+				</Label>
+				<Label text="23%" GridPane.rowIndex="5">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="50.0" />
+					</GridPane.margin>
+				</Label>
+				<Label text="8%" GridPane.rowIndex="6">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="50.0" />
+					</GridPane.margin>
+				</Label>
+				<Label text="5%" GridPane.rowIndex="7">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="50.0" />
+					</GridPane.margin>
+				</Label>
+				<Label text="0%" GridPane.rowIndex="8">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="50.0" />
+					</GridPane.margin>
+				</Label>
+				<TextField fx:id="textFieldNet4" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="8">
+					<GridPane.margin>
+						<Insets left="150.0" right="400.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldVat4" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+					<GridPane.margin>
+						<Insets left="120.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+				<Label text="zw." GridPane.rowIndex="9">
+					<font>
+						<Font name="System Bold" size="16.0" />
+					</font>
+					<GridPane.margin>
+						<Insets left="50.0" />
+					</GridPane.margin>
+				</Label>
+				<TextField fx:id="textFieldNet5" alignment="CENTER" text="0" GridPane.columnSpan="2" GridPane.rowIndex="9">
+					<GridPane.margin>
+						<Insets left="150.0" right="400.0" />
+					</GridPane.margin>
+				</TextField>
+				<TextField fx:id="textFieldVat5" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+					<GridPane.margin>
+						<Insets left="120.0" right="150.0" />
+					</GridPane.margin>
+				</TextField>
+			</children>
+			<columnConstraints>
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="404.0" minWidth="10.0" prefWidth="238.0" />
+				<ColumnConstraints hgrow="SOMETIMES" maxWidth="496.0" minWidth="10.0" prefWidth="444.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="24.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="40.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="42.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="38.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="50.0" minHeight="10.0" prefHeight="36.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="23.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="41.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="74.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+				<RowConstraints maxHeight="93.0" minHeight="10.0" prefHeight="89.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+			</rowConstraints>
+		</GridPane>
+	</children>
 </AnchorPane>

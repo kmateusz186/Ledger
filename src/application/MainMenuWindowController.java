@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import model.User;
 
 public class MainMenuWindowController implements Initializable {
-	
+
 	private int id_uzytkownik;
 	@FXML
 	private Text textWelcome;
@@ -36,34 +36,34 @@ public class MainMenuWindowController implements Initializable {
 	private Button btnLogOut;
 	@FXML
 	private AnchorPane anchorPaneEditor;
-	
-	private static final String CONN_STR = "jdbc:h2:"+ System.getProperty("user.dir") + "/db/ledgerdatabase;";
-	
+
+	private static final String CONN_STR = "jdbc:h2:" + System.getProperty("user.dir") + "/db/ledgerdatabase;";
+
 	@FXML
 	public void handleButtonAction(ActionEvent event) throws IOException {
 		Parent root;
 		Stage stage = null;
-		if(event.getSource()==btnLedger) {
+		if (event.getSource() == btnLedger) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("NewLedgerFXML.fxml"));
-            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            Scene scene = new Scene(loader.load());
+			stage = (Stage) anchorPaneEditor.getScene().getWindow();
+			Scene scene = new Scene(loader.load());
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-            stage.setScene(scene);
-            NewLedgerController newLedgerController = loader.<NewLedgerController>getController();
-            newLedgerController.initData(id_uzytkownik);
-            stage.setResizable(false);
-            stage.show();
-		} else if(event.getSource()==btnShowData) {
+			stage.setScene(scene);
+			NewLedgerController newLedgerController = loader.<NewLedgerController> getController();
+			newLedgerController.initData(id_uzytkownik);
+			stage.setResizable(false);
+			stage.show();
+		} else if (event.getSource() == btnShowData) {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("ShowDataMenuFXML.fxml"));
-            stage = (Stage) anchorPaneEditor.getScene().getWindow();
-            Scene scene = new Scene(loader.load());
+			stage = (Stage) anchorPaneEditor.getScene().getWindow();
+			Scene scene = new Scene(loader.load());
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-            stage.setScene(scene);
-            ShowDataMenuController showDataMenuController = loader.<ShowDataMenuController>getController();
-            showDataMenuController.initData(id_uzytkownik);
-            stage.setResizable(false);
-            stage.show();
-		} else if (event.getSource()==btnLogOut) {
+			stage.setScene(scene);
+			ShowDataMenuController showDataMenuController = loader.<ShowDataMenuController> getController();
+			showDataMenuController.initData(id_uzytkownik);
+			stage.setResizable(false);
+			stage.show();
+		} else if (event.getSource() == btnLogOut) {
 			stage = (Stage) anchorPaneEditor.getScene().getWindow();
 			root = FXMLLoader.load(getClass().getResource("WelcomeWindowFXML.fxml"));
 			Scene scene = new Scene(root);
@@ -73,7 +73,7 @@ public class MainMenuWindowController implements Initializable {
 			stage.show();
 		}
 	}
-	
+
 	private Connection openConnection(String connStr) {
 		String user = "test";
 		String pass = "test";
@@ -84,7 +84,7 @@ public class MainMenuWindowController implements Initializable {
 		System.out.println("Po³¹czenie z serwerem H2 otwarte!");
 		return conn;
 	}
-	
+
 	private Boolean closeConnection(Connection conn) {
 		try {
 			conn.close();
@@ -92,41 +92,45 @@ public class MainMenuWindowController implements Initializable {
 			System.out.println("B³¹d przy zamykaniu po³¹czenia: " + e);
 			System.exit(-1);
 		}
-		System.out.println("Po³¹cznie zosta³o zamkniête"); 
+		System.out.println("Po³¹cznie zosta³o zamkniête");
 		return true;
 	}
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+
 	}
-	
+
 	public void initData(int id_uzytkownik) {
-		this.id_uzytkownik = id_uzytkownik;
-		
 		Connection conn;
-		User user;
+		User user = null;
+		this.id_uzytkownik = id_uzytkownik;
 		conn = openConnection(CONN_STR);
 		user = getUser(conn, id_uzytkownik);
 		closeConnection(conn);
-		String name = user.getName();
-		textWelcome.setText("Witaj "+ name.substring(0,1).toUpperCase() + name.substring(1).toLowerCase() + ", ");
-		textCompanyData.setText("NIP: " + user.getNip() + " \n" +  user.getNameCompany());
+		if (user != null) {
+			String name = user.getName();
+			textWelcome.setText("Witaj " + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase() + ", ");
+			textCompanyData.setText("NIP: " + user.getNip() + " \n" + user.getNameCompany());
+		} else {
+			System.out.println("B³¹d odczytu danych u¿ytkownika");
+		}
 	}
-	
+
 	private User getUser(Connection conn, int id) {
 		User user = new User();
 		try {
-			String query = String.format("select imie, nip, nazwa_firmy, adres_firmy from uzytkownik where id_uzytkownik = '%d'", id);
+			String query = String.format(
+					"select imie, nip, nazwa_firmy, adres_firmy from uzytkownik where id_uzytkownik = '%d'", id);
 			Statement stm = conn.createStatement();
 			ResultSet rs = stm.executeQuery(query);
-			while(rs.next()) {
+			while (rs.next()) {
 				user.setName(rs.getString(1));
 				user.setNip(rs.getString(2));
 				user.setNameCompany(rs.getString(3));
 				user.setAddress(rs.getString(4));
 			}
-		} catch(SQLException ex) {
+		} catch (SQLException ex) {
 			System.out.println("B³¹d pobierania danych o sposobach opodatkowania: " + ex);
 		}
 		return user;
